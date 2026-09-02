@@ -19,23 +19,25 @@ class TranslatableModelsTest extends TestCase
             'sku' => 'COFFEE-001',
             'price' => 2500,
             'en' => [
-                'name' => 'Coffee',
-                'slug' => 'coffee',
+                'name' => 'Fresh Coffee',
+                'slug' => 'user-controlled-slug',
                 'description' => 'Fresh coffee.',
             ],
             'ar' => [
-                'name' => 'قهوة',
-                'slug' => 'قهوة',
+                'name' => 'قهوة طازجة',
+                'slug' => 'another-user-controlled-slug',
                 'description' => 'قهوة طازجة.',
             ],
         ]);
 
-        $this->assertSame('Coffee', $product->translate('en')->name);
-        $this->assertSame('قهوة', $product->translate('ar')->name);
+        $this->assertSame('Fresh Coffee', $product->translate('en')->name);
+        $this->assertSame('fresh-coffee', $product->translate('en')->slug);
+        $this->assertSame('قهوة طازجة', $product->translate('ar')->name);
+        $this->assertSame('قهوة-طازجة', $product->translate('ar')->slug);
         $this->assertDatabaseHas('product_translations', [
             'product_id' => $product->id,
             'locale' => 'ar',
-            'slug' => 'قهوة',
+            'slug' => 'قهوة-طازجة',
         ]);
     }
 
@@ -47,12 +49,10 @@ class TranslatableModelsTest extends TestCase
             'author_id' => $author->id,
             'en' => [
                 'title' => 'Brewing Guide',
-                'slug' => 'brewing-guide',
                 'content' => 'English guide.',
             ],
             'ar' => [
                 'title' => 'دليل التحضير',
-                'slug' => 'دليل-التحضير',
                 'content' => 'الدليل العربي.',
             ],
         ]);
@@ -64,6 +64,24 @@ class TranslatableModelsTest extends TestCase
         ]);
 
         $this->assertSame('دليل التحضير', $article->translate('ar')->title);
+        $this->assertSame('دليل-التحضير', $article->translate('ar')->slug);
         $this->assertSame('صنع لعشاق القهوة', $setting->translate('ar')->value);
+    }
+
+    public function test_duplicate_translated_names_receive_unique_locale_scoped_slugs(): void
+    {
+        Product::create([
+            'sku' => 'COFFEE-001',
+            'price' => 2500,
+            'en' => ['name' => 'Coffee Beans'],
+        ]);
+
+        $secondProduct = Product::create([
+            'sku' => 'COFFEE-002',
+            'price' => 3000,
+            'en' => ['name' => 'Coffee Beans'],
+        ]);
+
+        $this->assertSame('coffee-beans-2', $secondProduct->translate('en')->slug);
     }
 }

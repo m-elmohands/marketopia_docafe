@@ -24,6 +24,11 @@ class Order extends Model
         return $this->hasMany(OrderItem::class);
     }
 
+    public function paymentIntentions(): HasMany
+    {
+        return $this->hasMany(PaymentIntention::class);
+    }
+
     protected function casts(): array
     {
         return [
