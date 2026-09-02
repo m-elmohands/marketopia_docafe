@@ -1,67 +1,322 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Do Cafe
 
-## Do Cafe Ecommerce API
+Do Cafe is a bilingual coffee ecommerce application built with Laravel and Filament. It provides an English/Arabic administration panel, a versioned storefront API, persistent carts, stock-safe checkout, Paymob Unified Checkout, articles, public settings, role-based access control, and media management.
 
-The `/api/v1` API provides Sanctum customer authentication, localized catalog and articles, persistent carts, stock-safe checkout, orders, and Paymob Unified Checkout. Send `Accept-Language: en` or `ar` and use integer minor units for money. Checkout idempotency keys are generated automatically by the backend.
+## Main features
 
-Configure the `PAYMOB_*` variables from `.env.example` and point the Paymob transaction callback to `PAYMOB_NOTIFICATION_URL`. The API contract is documented in [`docs/api/openapi.yaml`](docs/api/openapi.yaml).
+- English and Arabic catalog content using Astrotomic Translatable
+- Automatic localized slugs generated from English and Arabic names or titles
+- Products, hierarchical categories, articles, settings, orders, and coffee-formation stages
+- Product, category, article, and stage images through Spatie Media Library
+- Filament administration with modal create/edit flows and LTR/RTL localization
+- Spatie roles and permissions for administrative authorization
+- Sanctum API authentication for storefront customers
+- Persistent customer carts with inventory validation
+- Transaction-safe checkout with backend-generated idempotency keys
+- Delivery fee and tax calculation from administrative settings
+- Paymob payment intentions, signed callbacks, transactions, and payment-result handling
+- OpenAPI, Swagger UI, and an import-ready Postman collection
+- English and Arabic validation and operational messages
 
-Interactive API documentation is available at `/api/documentation`, and the raw specification is served from `/api/openapi.yaml`.
-The import-ready Postman collection URL is `/api/postman-collection`; Postman can import this URL directly, and its `base_url` is generated from `APP_URL`.
+## Technology
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+- PHP 8.3+
+- Laravel 13
+- Filament 5
+- MySQL
+- Laravel Sanctum
+- Astrotomic Laravel Translatable
+- Spatie Laravel Media Library
+- Spatie Laravel Permission
+- Tailwind CSS 4 and Vite
 
-## About Laravel
+## Requirements
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Install these services directly on the development machine:
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- PHP 8.3 or newer with the extensions required by Laravel and MySQL
+- Composer
+- MySQL
+- Node.js and npm
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Docker and Laravel Sail are not required.
 
-## Learning Laravel
+## Local installation
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+Clone the repository and enter its directory, then run:
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+composer install
+cp .env.example .env
+php artisan key:generate
+npm install
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Create a MySQL database and configure `.env`:
 
-## Contributing
+```env
+APP_NAME="Do Cafe"
+APP_ENV=local
+APP_DEBUG=true
+APP_URL=http://localhost:8000
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=do_cafe
+DB_USERNAME=root
+DB_PASSWORD=
+```
 
-## Code of Conduct
+Run migrations, create the public storage link, and build the frontend:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+php artisan migrate
+php artisan storage:link
+npm run build
+```
 
-## Security Vulnerabilities
+For active frontend development, use `npm run dev`. Start Laravel locally with:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```bash
+php artisan serve
+```
+
+The root URL redirects to the Filament administration panel at `/admin`.
+
+## Languages
+
+The application supports English and Arabic:
+
+```env
+APP_LOCALE=en
+APP_FALLBACK_LOCALE=en
+TRANSLATABLE_LOCALES=en,ar
+TRANSLATABLE_USE_FALLBACK=true
+```
+
+Storefront API clients select the response language with `Accept-Language: en` or `Accept-Language: ar`. Dynamic catalog translations are stored in database translation tables; interface translations are stored in JSON and validation language files under `lang`.
+
+## Database seeding
+
+Configure the initial administrator before running the root seeder:
+
+```env
+ADMIN_USER_NAME="Store Admin"
+ADMIN_USER_EMAIL=admin@example.com
+ADMIN_USER_PASSWORD="use-a-long-random-password"
+```
+
+The administrator password must contain at least 12 characters. Run all seeders with:
+
+```bash
+php artisan db:seed
+```
+
+This creates roles and permissions, the initial administrator, a bilingual coffee-drink catalog with categories and preparation stages, bilingual coffee articles, and seeded media.
+
+Individual catalog seeders can be safely rerun without duplicating their canonical records:
+
+```bash
+php artisan db:seed --class=CoffeeCatalogSeeder
+php artisan db:seed --class=CoffeeArticleSeeder
+```
+
+Do not suppress model events while seeding translated models. Astrotomic uses model lifecycle events to persist pending translations.
+
+## Media storage
+
+Spatie Media Library stores media on the `public` disk by default:
+
+```env
+MEDIA_DISK=public
+```
+
+Ensure the public storage link exists:
+
+```bash
+php artisan storage:link
+```
+
+The web server must be able to write to `storage` and `bootstrap/cache`. Production deployments must include the seed assets under `database/seeders/assets/coffee`.
+
+## Administration panel
+
+Open `/admin` and sign in with the seeded administrator. The panel manages products and formation stages, categories, articles, settings, orders, payment transactions and refunds, and administrative users.
+
+Administrative actions are protected by policies and Spatie permissions. English and Arabic can be switched from the panel, with the corresponding LTR or RTL layout.
+
+## Storefront API
+
+All storefront endpoints are versioned under `/api/v1`.
+
+### Public endpoints
+
+| Method | Endpoint | Purpose |
+| --- | --- | --- |
+| `POST` | `/api/v1/auth/register` | Register a customer and issue a token |
+| `POST` | `/api/v1/auth/login` | Authenticate and issue a token |
+| `GET` | `/api/v1/products` | Search, filter, sort, and paginate products |
+| `GET` | `/api/v1/products/{slug}` | View a localized product |
+| `GET` | `/api/v1/categories` | List the category hierarchy |
+| `GET` | `/api/v1/articles` | List published articles |
+| `GET` | `/api/v1/articles/{slug}` | View a published article |
+| `GET` | `/api/v1/settings` | Retrieve public settings |
+| `POST` | `/api/v1/payments/paymob/webhook` | Receive signed Paymob callbacks |
+
+### Authenticated endpoints
+
+Send `Authorization: Bearer YOUR_TOKEN` with authenticated requests.
+
+| Method | Endpoint | Purpose |
+| --- | --- | --- |
+| `GET` | `/api/v1/auth/user` | Get the authenticated customer |
+| `POST` | `/api/v1/auth/logout` | Revoke the current token |
+| `GET` | `/api/v1/cart` | View the cart |
+| `POST` | `/api/v1/cart/items` | Add a product |
+| `PATCH` | `/api/v1/cart/items/{cartItem}` | Change item quantity |
+| `DELETE` | `/api/v1/cart/items/{cartItem}` | Remove an item |
+| `POST` | `/api/v1/checkout` | Create an order and Paymob checkout URL |
+| `GET` | `/api/v1/orders` | List the customer’s orders |
+| `GET` | `/api/v1/orders/{order}` | View an owned order |
+
+API responses use a consistent envelope:
+
+```json
+{
+  "data": {},
+  "message": "",
+  "errors": null
+}
+```
+
+Money is represented as integer minor units. For example, `11500` represents EGP 115.00.
+
+## API documentation
+
+- Swagger UI: `/api/documentation`
+- Raw OpenAPI specification: `/api/openapi.yaml`
+- Import-ready Postman collection: `/api/postman-collection`
+- Source OpenAPI file: `docs/api/openapi.yaml`
+- Source Postman template: `docs/api/do-cafe.postman_collection.json`
+
+The served Postman collection generates its `base_url` from `APP_URL`.
+
+## Checkout and Paymob
+
+Configure Paymob using environment variables only:
+
+```env
+PAYMOB_BASE_URL=https://accept.paymob.com
+PAYMOB_SECRET_KEY=
+PAYMOB_PUBLIC_KEY=
+PAYMOB_HMAC_SECRET=
+PAYMOB_INTEGRATION_IDS=
+PAYMOB_NOTIFICATION_URL="${APP_URL}/api/v1/payments/paymob/webhook"
+PAYMOB_REDIRECTION_URL="${APP_URL}/payment/result"
+PAYMOB_TIMEOUT=20
+```
+
+`PAYMOB_INTEGRATION_IDS` is a comma-separated list.
+
+The checkout flow is:
+
+1. An authenticated customer adds available products to the cart.
+2. The client submits `POST /api/v1/checkout`.
+3. The backend locks inventory, calculates totals, creates an order, generates its idempotency key, and creates a Paymob intention.
+4. The API returns `checkout_url`; the frontend redirects the customer to it.
+5. Paymob sends a signed server callback to `PAYMOB_NOTIFICATION_URL`.
+6. Paymob redirects the customer’s browser to `PAYMOB_REDIRECTION_URL`.
+7. The backend verifies the HMAC, amount, currency, and order reference before marking the order paid.
+
+The webhook is the primary payment confirmation. The signed `/payment/result` handler safely reconciles the transaction when the webhook is delayed.
+
+### Local Paymob testing
+
+Paymob cannot send server callbacks to `localhost`. Expose Laravel through a public HTTPS tunnel such as ngrok:
+
+```bash
+ngrok http 8000
+```
+
+Then configure:
+
+```env
+PAYMOB_NOTIFICATION_URL=https://your-tunnel-domain.ngrok-free.app/api/v1/payments/paymob/webhook
+PAYMOB_REDIRECTION_URL=http://localhost:8000/payment/result
+```
+
+Clear cached configuration and create a new checkout intention:
+
+```bash
+php artisan optimize:clear
+```
+
+Existing Paymob intentions retain the callback URLs used when they were created.
+
+## Queue worker
+
+Queued media conversions and other background work require a worker:
+
+```bash
+php artisan queue:work --tries=3
+```
+
+Configure a persistent process manager such as Supervisor in production.
+
+## Testing and quality checks
+
+```bash
+php artisan test
+vendor/bin/pint --test
+composer validate --no-check-publish
+npm run build
+```
+
+Run `vendor/bin/pint` to format PHP files. Tests use isolated databases, factories, fake media disks, and fake Paymob HTTP responses; they do not require live provider credentials.
+
+## Production deployment
+
+Use production-safe environment settings:
+
+```env
+APP_ENV=production
+APP_DEBUG=false
+APP_URL=https://your-domain.example
+```
+
+A typical deployment includes:
+
+```bash
+composer install --no-dev --optimize-autoloader
+npm ci
+npm run build
+php artisan migrate --force
+php artisan storage:link
+php artisan optimize:clear
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+```
+
+Also ensure that:
+
+- `docs/api` and `database/seeders/assets/coffee` are included in the deployment artifact.
+- `storage` and `bootstrap/cache` are writable by the PHP process.
+- A queue worker is supervised and restarted after deployment.
+- Paymob notification and redirection URLs use the production HTTPS domain.
+- Secret keys and administrator credentials exist only in the production environment.
+- `APP_DEBUG` remains disabled to prevent stack traces from exposing server details.
+
+After changing environment configuration, run:
+
+```bash
+php artisan optimize:clear
+php artisan config:cache
+```
+
+Frequently requested public settings are cached and automatically invalidated after administrative updates.
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This is a private Do Cafe application. Distribution and usage are governed by the project owner’s terms.
