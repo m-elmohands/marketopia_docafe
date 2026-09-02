@@ -19,7 +19,7 @@ class PaymentTransactionInfolist
                         TextEntry::make('paymob_order_id')->copyable(),
                         TextEntry::make('integration_id')->copyable(),
                         TextEntry::make('status')->badge(),
-                        TextEntry::make('amount_cents')->money(fn ($record): string => $record->currency, divideBy: 100),
+                        TextEntry::make('amount_cents')->money(fn ($record): string => $record->currency->value, divideBy: 100),
                         TextEntry::make('source_type'),
                         TextEntry::make('source_subtype'),
                         TextEntry::make('masked_pan'),

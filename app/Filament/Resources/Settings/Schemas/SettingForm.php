@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Settings\Schemas;
 
+use App\Enums\SettingType;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -20,12 +21,7 @@ class SettingForm
                     ->schema([
                         TextInput::make('key')->required()->maxLength(255)->unique(ignoreRecord: true),
                         TextInput::make('group')->required()->default('general')->maxLength(255),
-                        Select::make('type')->options([
-                            'string' => __('Text'),
-                            'integer' => __('Integer'),
-                            'boolean' => __('Boolean'),
-                            'json' => __('JSON'),
-                        ])->required()->default('string'),
+                        Select::make('type')->options(SettingType::class)->required()->default(SettingType::String->value),
                         Toggle::make('is_public')->label(__('Publicly accessible')),
                     ]),
                 Section::make(__('Localized values'))

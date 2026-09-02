@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Articles\Tables;
 
+use App\Enums\ArticleStatus;
 use App\Models\Article;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -24,20 +25,12 @@ class ArticlesTable
                 SpatieMediaLibraryImageColumn::make('image')->collection('article-images'),
                 TextColumn::make('title')->label('Article')->wrap(),
                 TextColumn::make('author.name')->searchable()->sortable(),
-                TextColumn::make('status')->badge()->color(fn (string $state): string => match ($state) {
-                    'published' => 'success',
-                    'archived' => 'gray',
-                    default => 'warning',
-                }),
+                TextColumn::make('status')->badge(),
                 ToggleColumn::make('is_featured')->label('Featured'),
                 TextColumn::make('published_at')->dateTime()->sortable(),
             ])
             ->filters([
-                SelectFilter::make('status')->options([
-                    'draft' => 'Draft',
-                    'published' => 'Published',
-                    'archived' => 'Archived',
-                ]),
+                SelectFilter::make('status')->options(ArticleStatus::class),
                 TrashedFilter::make(),
             ])
             ->recordActions([

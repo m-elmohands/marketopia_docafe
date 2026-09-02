@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Orders\Tables;
 
+use App\Enums\OrderStatus;
+use App\Enums\PaymentStatus;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
@@ -16,30 +18,15 @@ class OrdersTable
             ->columns([
                 TextColumn::make('order_number')->searchable()->copyable()->sortable(),
                 TextColumn::make('customer_name')->searchable(),
-                TextColumn::make('grand_total')->money(fn ($record): string => $record->currency, divideBy: 100)->sortable(),
+                TextColumn::make('grand_total')->money(fn ($record): string => $record->currency->value, divideBy: 100)->sortable(),
                 TextColumn::make('status')->badge(),
-                TextColumn::make('payment_status')->badge()->color(fn (string $state): string => match ($state) {
-                    'paid' => 'success',
-                    'failed' => 'danger',
-                    'refunded' => 'info',
-                    default => 'warning',
-                }),
+                TextColumn::make('payment_status')->badge(),
                 TextColumn::make('fulfillment_status')->badge(),
                 TextColumn::make('placed_at')->dateTime()->sortable(),
             ])
             ->filters([
-                SelectFilter::make('status')->options([
-                    'pending' => 'Pending',
-                    'processing' => 'Processing',
-                    'completed' => 'Completed',
-                    'cancelled' => 'Cancelled',
-                ]),
-                SelectFilter::make('payment_status')->options([
-                    'pending' => 'Pending',
-                    'paid' => 'Paid',
-                    'failed' => 'Failed',
-                    'refunded' => 'Refunded',
-                ]),
+                SelectFilter::make('status')->options(OrderStatus::class),
+                SelectFilter::make('payment_status')->options(PaymentStatus::class),
             ])
             ->recordActions([
                 ViewAction::make(),

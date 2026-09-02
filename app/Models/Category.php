@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\CatalogStatus;
 use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
 use Astrotomic\Translatable\Translatable;
 use Illuminate\Database\Eloquent\Model;
@@ -69,6 +70,7 @@ class Category extends Model implements HasMedia, TranslatableContract
     protected function casts(): array
     {
         return [
+            'status' => CatalogStatus::class,
             'is_featured' => 'boolean',
         ];
     }

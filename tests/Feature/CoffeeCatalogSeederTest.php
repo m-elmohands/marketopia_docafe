@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Enums\CatalogStatus;
+use App\Enums\Currency;
 use App\Models\Category;
 use App\Models\Product;
 use Database\Seeders\CoffeeCatalogSeeder;
@@ -33,8 +35,8 @@ class CoffeeCatalogSeederTest extends TestCase
         $this->assertSame('Spanish Latte', $spanishLatte->translate('en')->name);
         $this->assertSame('سبانيش لاتيه', $spanishLatte->translate('ar')->name);
         $this->assertSame(11_500, $spanishLatte->price);
-        $this->assertSame('EGP', $spanishLatte->currency);
-        $this->assertSame('active', $spanishLatte->status);
+        $this->assertSame(Currency::EGP, $spanishLatte->currency);
+        $this->assertSame(CatalogStatus::Active, $spanishLatte->status);
         $this->assertFalse($spanishLatte->track_inventory);
         $this->assertTrue($spanishLatte->is_featured);
         $this->assertNotNull($spanishLatte->published_at);

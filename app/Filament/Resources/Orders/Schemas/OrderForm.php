@@ -2,6 +2,9 @@
 
 namespace App\Filament\Resources\Orders\Schemas;
 
+use App\Enums\FulfillmentStatus;
+use App\Enums\OrderStatus;
+use App\Enums\PaymentStatus;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Schemas\Components\Section;
@@ -16,24 +19,9 @@ class OrderForm
                 Section::make(__('Order workflow'))
                     ->columns(3)
                     ->schema([
-                        Select::make('status')->options([
-                            'pending' => __('Pending'),
-                            'processing' => __('Processing'),
-                            'completed' => __('Completed'),
-                            'cancelled' => __('Cancelled'),
-                        ])->required(),
-                        Select::make('payment_status')->options([
-                            'pending' => __('Pending'),
-                            'paid' => __('Paid'),
-                            'failed' => __('Failed'),
-                            'refunded' => __('Refunded'),
-                        ])->required(),
-                        Select::make('fulfillment_status')->options([
-                            'unfulfilled' => __('Unfulfilled'),
-                            'processing' => __('Processing'),
-                            'fulfilled' => __('Fulfilled'),
-                            'returned' => __('Returned'),
-                        ])->required(),
+                        Select::make('status')->options(OrderStatus::class)->required(),
+                        Select::make('payment_status')->options(PaymentStatus::class)->required(),
+                        Select::make('fulfillment_status')->options(FulfillmentStatus::class)->required(),
                         Textarea::make('admin_notes')->rows(5)->columnSpanFull(),
                     ]),
             ]);

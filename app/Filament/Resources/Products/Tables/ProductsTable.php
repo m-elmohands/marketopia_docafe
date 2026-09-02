@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Products\Tables;
 
+use App\Enums\CatalogStatus;
 use App\Models\Product;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -25,22 +26,14 @@ class ProductsTable
                 SpatieMediaLibraryImageColumn::make('image')->collection('product-images')->circular(),
                 TextColumn::make('name')->label('Product')->searchable(['sku'])->wrap(),
                 TextColumn::make('sku')->searchable()->copyable(),
-                TextColumn::make('price')->money(fn ($record): string => $record->currency, divideBy: 100)->sortable(),
+                TextColumn::make('price')->money(fn ($record): string => $record->currency->value, divideBy: 100)->sortable(),
                 TextColumn::make('stock_quantity')->label('Stock')->numeric()->sortable(),
-                TextColumn::make('status')->badge()->color(fn (string $state): string => match ($state) {
-                    'active' => 'success',
-                    'archived' => 'gray',
-                    default => 'warning',
-                }),
+                TextColumn::make('status')->badge(),
                 ToggleColumn::make('is_featured')->label('Featured'),
                 TextColumn::make('updated_at')->dateTime()->sortable()->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                SelectFilter::make('status')->options([
-                    'draft' => 'Draft',
-                    'active' => 'Active',
-                    'archived' => 'Archived',
-                ]),
+                SelectFilter::make('status')->options(CatalogStatus::class),
                 TrashedFilter::make(),
             ])
             ->recordActions([

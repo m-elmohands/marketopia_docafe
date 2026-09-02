@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\PaymentTransactions\Tables;
 
+use App\Enums\PaymentProcessingStatus;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -16,22 +17,14 @@ class PaymentTransactionsTable
             ->columns([
                 TextColumn::make('paymob_transaction_id')->label('Transaction')->searchable()->copyable(),
                 TextColumn::make('intention.order.order_number')->label('Order')->searchable(),
-                TextColumn::make('amount_cents')->label('Amount')->money(fn ($record): string => $record->currency, divideBy: 100)->sortable(),
+                TextColumn::make('amount_cents')->label('Amount')->money(fn ($record): string => $record->currency->value, divideBy: 100)->sortable(),
                 TextColumn::make('source_type')->label('Method')->badge(),
-                TextColumn::make('status')->badge()->color(fn (string $state): string => match ($state) {
-                    'succeeded' => 'success',
-                    'failed' => 'danger',
-                    default => 'warning',
-                }),
+                TextColumn::make('status')->badge(),
                 IconColumn::make('is_3d_secure')->label('3DS')->boolean(),
                 TextColumn::make('processed_at')->dateTime()->sortable(),
             ])
             ->filters([
-                SelectFilter::make('status')->options([
-                    'pending' => 'Pending',
-                    'succeeded' => 'Succeeded',
-                    'failed' => 'Failed',
-                ]),
+                SelectFilter::make('status')->options(PaymentProcessingStatus::class),
             ])
             ->recordActions([
                 ViewAction::make(),

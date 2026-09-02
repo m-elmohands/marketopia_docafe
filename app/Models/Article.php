@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\ArticleStatus;
 use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
 use Astrotomic\Translatable\Translatable;
 use Illuminate\Database\Eloquent\Model;
@@ -40,6 +41,7 @@ class Article extends Model implements HasMedia, TranslatableContract
     protected function casts(): array
     {
         return [
+            'status' => ArticleStatus::class,
             'is_featured' => 'boolean',
             'published_at' => 'datetime',
         ];

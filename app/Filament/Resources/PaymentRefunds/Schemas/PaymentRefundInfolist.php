@@ -17,7 +17,7 @@ class PaymentRefundInfolist
                     ->schema([
                         TextEntry::make('paymob_transaction_id')->copyable()->placeholder('Pending'),
                         TextEntry::make('transaction.paymob_transaction_id')->label('Original transaction')->copyable(),
-                        TextEntry::make('amount_cents')->label('Amount')->money(fn ($record): string => $record->currency, divideBy: 100),
+                        TextEntry::make('amount_cents')->label('Amount')->money(fn ($record): string => $record->currency->value, divideBy: 100),
                         TextEntry::make('status')->badge(),
                         TextEntry::make('requestedBy.name')->label('Requested by'),
                         TextEntry::make('processed_at')->dateTime()->placeholder('Not processed'),

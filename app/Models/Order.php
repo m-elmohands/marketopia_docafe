@@ -2,6 +2,10 @@
 
 namespace App\Models;
 
+use App\Enums\Currency;
+use App\Enums\FulfillmentStatus;
+use App\Enums\OrderStatus;
+use App\Enums\PaymentStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -32,6 +36,10 @@ class Order extends Model
     protected function casts(): array
     {
         return [
+            'status' => OrderStatus::class,
+            'payment_status' => PaymentStatus::class,
+            'fulfillment_status' => FulfillmentStatus::class,
+            'currency' => Currency::class,
             'billing_address' => 'array',
             'shipping_address' => 'array',
             'placed_at' => 'datetime',

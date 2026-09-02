@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Categories\Tables;
 
+use App\Enums\CatalogStatus;
 use App\Models\Category;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -25,20 +26,12 @@ class CategoriesTable
                 TextColumn::make('name')->label('Category')->wrap(),
                 TextColumn::make('parent.name')->label('Parent')->placeholder('Top level'),
                 TextColumn::make('products_count')->counts('products')->label('Products')->numeric()->sortable(),
-                TextColumn::make('status')->badge()->color(fn (string $state): string => match ($state) {
-                    'active' => 'success',
-                    'archived' => 'gray',
-                    default => 'warning',
-                }),
+                TextColumn::make('status')->badge(),
                 TextColumn::make('sort_order')->numeric()->sortable(),
                 ToggleColumn::make('is_featured')->label('Featured'),
             ])
             ->filters([
-                SelectFilter::make('status')->options([
-                    'draft' => 'Draft',
-                    'active' => 'Active',
-                    'archived' => 'Archived',
-                ]),
+                SelectFilter::make('status')->options(CatalogStatus::class),
                 TrashedFilter::make(),
             ])
             ->defaultSort('sort_order')

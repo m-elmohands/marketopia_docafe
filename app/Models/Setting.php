@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\SettingType;
 use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
 use Astrotomic\Translatable\Translatable;
 use Illuminate\Database\Eloquent\Model;
@@ -24,6 +25,7 @@ class Setting extends Model implements TranslatableContract
     protected function casts(): array
     {
         return [
+            'type' => SettingType::class,
             'is_public' => 'boolean',
         ];
     }

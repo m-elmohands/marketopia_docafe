@@ -26,18 +26,18 @@ class OrderInfolist
                 Section::make(__('Totals'))
                     ->columns(5)
                     ->schema([
-                        TextEntry::make('subtotal')->money(fn ($record): string => $record->currency, divideBy: 100),
-                        TextEntry::make('discount_total')->money(fn ($record): string => $record->currency, divideBy: 100),
-                        TextEntry::make('shipping_total')->money(fn ($record): string => $record->currency, divideBy: 100),
-                        TextEntry::make('tax_total')->money(fn ($record): string => $record->currency, divideBy: 100),
-                        TextEntry::make('grand_total')->money(fn ($record): string => $record->currency, divideBy: 100)->weight('bold'),
+                        TextEntry::make('subtotal')->money(fn ($record): string => $record->currency->value, divideBy: 100),
+                        TextEntry::make('discount_total')->money(fn ($record): string => $record->currency->value, divideBy: 100),
+                        TextEntry::make('shipping_total')->money(fn ($record): string => $record->currency->value, divideBy: 100),
+                        TextEntry::make('tax_total')->money(fn ($record): string => $record->currency->value, divideBy: 100),
+                        TextEntry::make('grand_total')->money(fn ($record): string => $record->currency->value, divideBy: 100)->weight('bold'),
                     ]),
                 RepeatableEntry::make('items')
                     ->schema([
                         TextEntry::make('product_name'),
                         TextEntry::make('sku'),
                         TextEntry::make('quantity')->numeric(),
-                        TextEntry::make('line_total')->money(fn ($record): string => $record->order->currency, divideBy: 100),
+                        TextEntry::make('line_total')->money(fn ($record): string => $record->order->currency->value, divideBy: 100),
                     ])
                     ->columns(4)
                     ->columnSpanFull(),

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Articles\Schemas;
 
+use App\Enums\ArticleStatus;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
@@ -35,11 +36,7 @@ class ArticleForm
                     ->columns(2)
                     ->schema([
                         Select::make('author_id')->relationship('author', 'name')->searchable()->preload(),
-                        Select::make('status')->options([
-                            'draft' => __('Draft'),
-                            'published' => __('Published'),
-                            'archived' => __('Archived'),
-                        ])->required()->default('draft'),
+                        Select::make('status')->options(ArticleStatus::class)->required()->default(ArticleStatus::Draft->value),
                         DateTimePicker::make('published_at'),
                         Toggle::make('is_featured')->label(__('Featured')),
                     ]),

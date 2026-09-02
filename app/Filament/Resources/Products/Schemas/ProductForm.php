@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Products\Schemas;
 
+use App\Enums\CatalogStatus;
+use App\Enums\Currency;
 use App\Models\Category;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\KeyValue;
@@ -39,11 +41,7 @@ class ProductForm
                     ->schema([
                         TextInput::make('sku')->required()->maxLength(255)->unique(ignoreRecord: true),
                         TextInput::make('barcode')->maxLength(255)->unique(ignoreRecord: true),
-                        Select::make('status')->options([
-                            'draft' => __('Draft'),
-                            'active' => __('Active'),
-                            'archived' => __('Archived'),
-                        ])->required()->default('draft'),
+                        Select::make('status')->options(CatalogStatus::class)->required()->default(CatalogStatus::Draft->value),
                         Select::make('categories')
                             ->relationship('categories', 'id')
                             ->getOptionLabelFromRecordUsing(fn (Category $record): string => $record->name)
@@ -53,7 +51,7 @@ class ProductForm
                         TextInput::make('price')->label('Price (minor units)')->numeric()->minValue(0)->required(),
                         TextInput::make('compare_at_price')->label('Compare-at price')->numeric()->minValue(0),
                         TextInput::make('cost_price')->label('Cost price')->numeric()->minValue(0),
-                        Select::make('currency')->options(['EGP' => 'EGP', 'USD' => 'USD'])->required()->default('EGP'),
+                        Select::make('currency')->options(Currency::class)->required()->default(Currency::EGP->value),
                         TextInput::make('weight_grams')->numeric()->minValue(0)->suffix('g'),
                         Toggle::make('is_featured')->label(__('Featured'))->columnSpanFull(),
                     ]),

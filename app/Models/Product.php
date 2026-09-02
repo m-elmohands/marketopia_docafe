@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\CatalogStatus;
+use App\Enums\Currency;
 use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
 use Astrotomic\Translatable\Translatable;
 use Illuminate\Database\Eloquent\Model;
@@ -43,6 +45,8 @@ class Product extends Model implements HasMedia, TranslatableContract
     protected function casts(): array
     {
         return [
+            'status' => CatalogStatus::class,
+            'currency' => Currency::class,
             'track_inventory' => 'boolean',
             'is_featured' => 'boolean',
             'metadata' => 'array',

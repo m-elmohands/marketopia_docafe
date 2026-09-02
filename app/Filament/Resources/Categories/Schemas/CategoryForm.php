@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Categories\Schemas;
 
+use App\Enums\CatalogStatus;
 use App\Models\Category;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
@@ -38,11 +39,7 @@ class CategoryForm
                             ->getOptionLabelFromRecordUsing(fn (Category $record): string => $record->name)
                             ->preload()
                             ->placeholder(__('Top-level category')),
-                        Select::make('status')->options([
-                            'draft' => __('Draft'),
-                            'active' => __('Active'),
-                            'archived' => __('Archived'),
-                        ])->required()->default('draft'),
+                        Select::make('status')->options(CatalogStatus::class)->required()->default(CatalogStatus::Draft->value),
                         TextInput::make('sort_order')->numeric()->minValue(0)->default(0)->required(),
                         Toggle::make('is_featured')->label(__('Featured')),
                     ]),

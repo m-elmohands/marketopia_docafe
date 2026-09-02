@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\Currency;
+use App\Enums\PaymentProcessingStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -34,6 +36,8 @@ class PaymentRefund extends Model
     protected function casts(): array
     {
         return [
+            'status' => PaymentProcessingStatus::class,
+            'currency' => Currency::class,
             'provider_data' => 'array',
             'processed_at' => 'datetime',
             'failed_at' => 'datetime',
