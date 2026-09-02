@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Articles\Tables;
 use App\Enums\ArticleStatus;
 use App\Models\Article;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
@@ -40,6 +41,7 @@ class ArticlesTable
                         $record,
                         ['title', 'excerpt', 'content', 'meta_title', 'meta_description'],
                     )),
+                DeleteAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

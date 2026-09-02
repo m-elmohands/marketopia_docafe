@@ -34,7 +34,7 @@ class ArticleForm
                         Select::make('status')->options(ArticleStatus::class)->required()->default(ArticleStatus::Draft->value),
                         DateTimePicker::make('published_at'),
                         Toggle::make('is_featured')->label(__('Featured')),
-                    ]),
+                    ])->columnSpanFull(),
             ]);
     }
 
