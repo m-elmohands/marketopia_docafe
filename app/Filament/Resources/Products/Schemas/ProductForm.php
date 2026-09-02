@@ -34,8 +34,8 @@ class ProductForm
                     ->columnSpanFull(),
                 Tabs::make('Translations / الترجمات')
                     ->tabs([
-                        Tab::make('English')->schema(self::translationFields('en')),
-                        Tab::make('العربية')->schema(self::translationFields('ar')),
+                        Tab::make('English')->extraAttributes(['dir' => 'ltr'])->schema(self::translationFields('en')),
+                        Tab::make('العربية')->extraAttributes(['dir' => 'rtl'])->schema(self::translationFields('ar')),
                     ])
                     ->columnSpanFull(),
                 Section::make(__('Catalog and pricing'))
@@ -88,7 +88,7 @@ class ProductForm
                                     ->columnSpanFull(),
                                 Tabs::make('Translations / الترجمات')
                                     ->tabs([
-                                        Tab::make('English')->schema([
+                                        Tab::make('English')->extraAttributes(['dir' => 'ltr'])->schema([
                                             TextInput::make('en.title')
                                                 ->label('Title')
                                                 ->required()
@@ -99,7 +99,7 @@ class ProductForm
                                                 ->rows(4)
                                                 ->extraInputAttributes(['dir' => 'ltr']),
                                         ]),
-                                        Tab::make('العربية')->schema([
+                                        Tab::make('العربية')->extraAttributes(['dir' => 'rtl'])->schema([
                                             TextInput::make('ar.title')
                                                 ->label('العنوان')
                                                 ->required()

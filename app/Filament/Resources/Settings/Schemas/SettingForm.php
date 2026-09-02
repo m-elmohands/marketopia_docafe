@@ -19,11 +19,11 @@ class SettingForm
                     ->schema([
                         Tabs::make('Translations / الترجمات')
                             ->tabs([
-                                Tab::make('English')->schema([
+                                Tab::make('English')->extraAttributes(['dir' => 'ltr'])->schema([
                                     TextInput::make('identity.en.name')->label('Café name')->required()->maxLength(255),
                                     Textarea::make('identity.en.description')->label('Café description')->rows(4),
                                 ]),
-                                Tab::make('العربية')->schema([
+                                Tab::make('العربية')->extraAttributes(['dir' => 'rtl'])->schema([
                                     TextInput::make('identity.ar.name')->label('اسم المقهى')->required()->maxLength(255)->extraInputAttributes(['dir' => 'rtl']),
                                     Textarea::make('identity.ar.description')->label('وصف المقهى')->rows(4)->extraInputAttributes(['dir' => 'rtl']),
                                 ]),

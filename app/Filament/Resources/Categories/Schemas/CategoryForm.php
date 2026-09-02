@@ -27,8 +27,8 @@ class CategoryForm
                     ->columnSpanFull(),
                 Tabs::make('Translations / الترجمات')
                     ->tabs([
-                        Tab::make('English')->schema(self::translationFields('en')),
-                        Tab::make('العربية')->schema(self::translationFields('ar')),
+                        Tab::make('English')->extraAttributes(['dir' => 'ltr'])->schema(self::translationFields('en')),
+                        Tab::make('العربية')->extraAttributes(['dir' => 'rtl'])->schema(self::translationFields('ar')),
                     ])
                     ->columnSpanFull(),
                 Section::make(__('Organization and publishing'))

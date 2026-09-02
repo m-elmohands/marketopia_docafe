@@ -28,7 +28,9 @@ class TranslationTabsTest extends TestCase
             ->assertSee('English')
             ->assertSee('العربية')
             ->assertSee('Café name')
-            ->assertSee('اسم المقهى');
+            ->assertSee('اسم المقهى')
+            ->assertSee('dir="ltr"', false)
+            ->assertSee('dir="rtl"', false);
 
         app()->setLocale($originalLocale);
     }
