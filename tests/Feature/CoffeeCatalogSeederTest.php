@@ -6,6 +6,7 @@ use App\Enums\CatalogStatus;
 use App\Enums\Currency;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\ProductStage;
 use Database\Seeders\CoffeeCatalogSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -45,6 +46,13 @@ class CoffeeCatalogSeederTest extends TestCase
         $this->assertTrue($spanishLatte->categories->contains(
             fn (Category $category): bool => $category->translate('en')->name === 'Signature Coffee',
         ));
+
+        $stages = $spanishLatte->stages()->with('translations')->get();
+
+        $this->assertCount(4, $stages);
+        $this->assertSame([1, 2, 3, 4], $stages->pluck('sort_order')->all());
+        $this->assertSame('Bean Selection', $stages->first()->translate('en')->title);
+        $this->assertSame('اختيار حبوب القهوة', $stages->first()->translate('ar')->title);
     }
 
     public function test_it_can_be_run_repeatedly_without_duplicates(): void
@@ -56,6 +64,8 @@ class CoffeeCatalogSeederTest extends TestCase
         $this->assertSame(12, Product::count());
         $this->assertSame(8, DB::table('category_translations')->count());
         $this->assertSame(24, DB::table('product_translations')->count());
+        $this->assertSame(48, ProductStage::count());
+        $this->assertSame(96, DB::table('product_stage_translations')->count());
         $this->assertSame(16, DB::table('media')->count());
     }
 }

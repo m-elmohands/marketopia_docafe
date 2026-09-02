@@ -41,6 +41,7 @@ class CoffeeCatalogSeeder extends Seeder
                     collect($categoryKeys)->map(fn (string $key): int => $categories[$key]->id),
                 );
                 $this->attachImage($product, $image, 'product-images');
+                $this->seedStages($product);
             }
         });
     }
@@ -149,5 +150,45 @@ class CoffeeCatalogSeeder extends Seeder
             ->addMedia(database_path("seeders/assets/coffee/{$filename}"))
             ->preservingOriginal()
             ->toMediaCollection($collection);
+    }
+
+    private function seedStages(Product $product): void
+    {
+        if ($product->stages()->exists()) {
+            return;
+        }
+
+        foreach ($this->stages() as $index => $data) {
+            $stage = $product->stages()->make(['sort_order' => $index + 1]);
+
+            foreach (['en', 'ar'] as $locale) {
+                $stage->translateOrNew($locale)->fill($data[$locale]);
+            }
+
+            $stage->save();
+        }
+    }
+
+    /** @return list<array{en: array{title: string, description: string}, ar: array{title: string, description: string}}> */
+    private function stages(): array
+    {
+        return [
+            [
+                'en' => ['title' => 'Bean Selection', 'description' => 'Fresh coffee beans are selected for a balanced aroma and flavor.'],
+                'ar' => ['title' => 'اختيار حبوب القهوة', 'description' => 'تُختار حبوب قهوة طازجة للحصول على رائحة ونكهة متوازنة.'],
+            ],
+            [
+                'en' => ['title' => 'Grinding', 'description' => 'The beans are ground to the size required for this drink.'],
+                'ar' => ['title' => 'الطحن', 'description' => 'تُطحن الحبوب بالدرجة المناسبة لتحضير هذا المشروب.'],
+            ],
+            [
+                'en' => ['title' => 'Extraction', 'description' => 'The coffee is carefully extracted to develop its full character.'],
+                'ar' => ['title' => 'الاستخلاص', 'description' => 'تُستخلص القهوة بعناية لإظهار كامل نكهتها.'],
+            ],
+            [
+                'en' => ['title' => 'Finishing and Serving', 'description' => 'The drink is finished with its recipe ingredients and served fresh.'],
+                'ar' => ['title' => 'اللمسات النهائية والتقديم', 'description' => 'يُستكمل المشروب بمكونات الوصفة ويُقدم طازجًا.'],
+            ],
+        ];
     }
 }
