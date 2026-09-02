@@ -17,6 +17,7 @@ class CoffeeCatalogSeeder extends Seeder
 
             foreach ($this->products() as $sku => $data) {
                 $categoryKeys = $data['categories'];
+                $image = $this->imageFor($categoryKeys);
                 unset($data['categories']);
 
                 $product = Product::firstOrNew(['sku' => $sku]);
@@ -39,6 +40,7 @@ class CoffeeCatalogSeeder extends Seeder
                 $product->categories()->sync(
                     collect($categoryKeys)->map(fn (string $key): int => $categories[$key]->id),
                 );
+                $this->attachImage($product, $image, 'product-images');
             }
         });
     }
@@ -66,6 +68,7 @@ class CoffeeCatalogSeeder extends Seeder
             }
 
             $category->save();
+            $this->attachImage($category, $this->imageFor([$key]), 'category-images');
             $seeded[$key] = $category;
         }
 
@@ -123,5 +126,28 @@ class CoffeeCatalogSeeder extends Seeder
             'en' => ['name' => $enName, 'short_description' => $enDescription, 'description' => $enDescription],
             'ar' => ['name' => $arName, 'short_description' => $arDescription, 'description' => $arDescription],
         ];
+    }
+
+    /** @param list<string> $categories */
+    private function imageFor(array $categories): string
+    {
+        return match (true) {
+            in_array('signature', $categories, true) => 'signature-coffee.png',
+            in_array('iced', $categories, true) => 'iced-coffee.png',
+            in_array('hot', $categories, true) => 'hot-coffee.png',
+            default => 'espresso.png',
+        };
+    }
+
+    private function attachImage(Category|Product $model, string $filename, string $collection): void
+    {
+        if ($model->hasMedia($collection)) {
+            return;
+        }
+
+        $model
+            ->addMedia(database_path("seeders/assets/coffee/{$filename}"))
+            ->preservingOriginal()
+            ->toMediaCollection($collection);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Articles\Tables;
 
+use App\Models\Article;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -40,7 +41,12 @@ class ArticlesTable
                 TrashedFilter::make(),
             ])
             ->recordActions([
-                EditAction::make(),
+                EditAction::make()
+                    ->mutateRecordDataUsing(fn (array $data, Article $record): array => self::withTranslations(
+                        $data,
+                        $record,
+                        ['title', 'excerpt', 'content', 'meta_title', 'meta_description'],
+                    )),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
@@ -49,5 +55,15 @@ class ArticlesTable
                     RestoreBulkAction::make(),
                 ]),
             ]);
+    }
+
+    /** @param list<string> $attributes */
+    private static function withTranslations(array $data, Article $record, array $attributes): array
+    {
+        foreach (['en', 'ar'] as $locale) {
+            $data[$locale] = $record->translate($locale)?->only($attributes) ?? [];
+        }
+
+        return $data;
     }
 }

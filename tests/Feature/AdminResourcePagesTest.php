@@ -2,6 +2,16 @@
 
 namespace Tests\Feature;
 
+use App\Filament\Resources\Articles\ArticleResource;
+use App\Filament\Resources\Articles\Pages\ListArticles;
+use App\Filament\Resources\Categories\CategoryResource;
+use App\Filament\Resources\Categories\Pages\ListCategories;
+use App\Filament\Resources\Products\Pages\ListProducts;
+use App\Filament\Resources\Products\ProductResource;
+use App\Filament\Resources\Settings\Pages\ListSettings;
+use App\Filament\Resources\Settings\SettingResource;
+use App\Filament\Resources\Users\Pages\ListUsers;
+use App\Filament\Resources\Users\UserResource;
 use App\Filament\Widgets\CommerceOverview;
 use App\Models\Order;
 use App\Models\PaymentIntention;
@@ -9,6 +19,7 @@ use App\Models\PaymentRefund;
 use App\Models\PaymentTransaction;
 use App\Models\User;
 use Database\Seeders\AuthorizationSeeder;
+use Filament\Actions\Action;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -16,6 +27,75 @@ use Tests\TestCase;
 class AdminResourcePagesTest extends TestCase
 {
     use RefreshDatabase;
+
+    public function test_admin_can_switch_the_panel_between_english_and_arabic(): void
+    {
+        $this->seed(AuthorizationSeeder::class);
+
+        $admin = User::factory()->create();
+        $admin->assignRole('admin');
+
+        $this->actingAs($admin)
+            ->from('/admin')
+            ->get(route('admin.locale', ['locale' => 'ar']))
+            ->assertRedirect('/admin')
+            ->assertSessionHas('filament_locale', 'ar');
+
+        $this->get('/admin')
+            ->assertOk()
+            ->assertSee('dir="rtl"', false)
+            ->assertSee('الكتالوج');
+
+        $this->get(route('admin.locale', ['locale' => 'fr']))->assertNotFound();
+    }
+
+    public function test_create_and_edit_flows_are_configured_as_modal_actions(): void
+    {
+        $this->seed(AuthorizationSeeder::class);
+
+        $admin = User::factory()->create();
+        $admin->assignRole('admin');
+
+        $this->actingAs($admin);
+
+        foreach ([
+            ArticleResource::class,
+            CategoryResource::class,
+            ProductResource::class,
+            SettingResource::class,
+            UserResource::class,
+        ] as $resource) {
+            $this->assertFalse($resource::hasPage('create'));
+            $this->assertFalse($resource::hasPage('edit'));
+        }
+
+        foreach ([
+            ListArticles::class,
+            ListCategories::class,
+            ListProducts::class,
+            ListSettings::class,
+            ListUsers::class,
+        ] as $page) {
+            Livewire::test($page)
+                ->assertActionExists('create', fn (Action $action): bool => $action->getUrl() === null);
+        }
+    }
+
+    public function test_users_resource_excludes_the_authenticated_admin(): void
+    {
+        $this->seed(AuthorizationSeeder::class);
+
+        $admin = User::factory()->create();
+        $admin->assignRole('admin');
+        $managedUser = User::factory()->create();
+
+        $this->actingAs($admin);
+
+        $visibleUserIds = UserResource::getEloquentQuery()->pluck('id');
+
+        $this->assertFalse($visibleUserIds->contains($admin->id));
+        $this->assertTrue($visibleUserIds->contains($managedUser->id));
+    }
 
     public function test_admin_can_render_ecommerce_management_pages(): void
     {
@@ -64,13 +144,9 @@ class AdminResourcePagesTest extends TestCase
         foreach ([
             '/admin/profile',
             '/admin/products',
-            '/admin/products/create',
             '/admin/categories',
-            '/admin/categories/create',
             '/admin/articles',
-            '/admin/articles/create',
             '/admin/settings',
-            '/admin/settings/create',
             '/admin/orders',
             "/admin/orders/{$order->id}",
             '/admin/payment-transactions',
@@ -78,7 +154,6 @@ class AdminResourcePagesTest extends TestCase
             '/admin/payment-refunds',
             "/admin/payment-refunds/{$refund->id}",
             '/admin/users',
-            '/admin/users/create',
         ] as $uri) {
             $this->get($uri)->assertOk();
         }

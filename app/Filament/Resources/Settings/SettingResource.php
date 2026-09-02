@@ -2,8 +2,6 @@
 
 namespace App\Filament\Resources\Settings;
 
-use App\Filament\Resources\Settings\Pages\CreateSetting;
-use App\Filament\Resources\Settings\Pages\EditSetting;
 use App\Filament\Resources\Settings\Pages\ListSettings;
 use App\Filament\Resources\Settings\Schemas\SettingForm;
 use App\Filament\Resources\Settings\Tables\SettingsTable;
@@ -22,7 +20,20 @@ class SettingResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'key';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'System';
+    public static function getNavigationGroup(): ?string
+    {
+        return __('System');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('Setting');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('Settings');
+    }
 
     public static function form(Schema $schema): Schema
     {
@@ -45,8 +56,6 @@ class SettingResource extends Resource
     {
         return [
             'index' => ListSettings::route('/'),
-            'create' => CreateSetting::route('/create'),
-            'edit' => EditSetting::route('/{record}/edit'),
         ];
     }
 }

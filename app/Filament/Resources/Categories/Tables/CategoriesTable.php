@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Categories\Tables;
 
+use App\Models\Category;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -42,7 +43,12 @@ class CategoriesTable
             ])
             ->defaultSort('sort_order')
             ->recordActions([
-                EditAction::make(),
+                EditAction::make()
+                    ->mutateRecordDataUsing(fn (array $data, Category $record): array => self::withTranslations(
+                        $data,
+                        $record,
+                        ['name', 'description', 'meta_title', 'meta_description'],
+                    )),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
@@ -51,5 +57,15 @@ class CategoriesTable
                     RestoreBulkAction::make(),
                 ]),
             ]);
+    }
+
+    /** @param list<string> $attributes */
+    private static function withTranslations(array $data, Category $record, array $attributes): array
+    {
+        foreach (['en', 'ar'] as $locale) {
+            $data[$locale] = $record->translate($locale)?->only($attributes) ?? [];
+        }
+
+        return $data;
     }
 }

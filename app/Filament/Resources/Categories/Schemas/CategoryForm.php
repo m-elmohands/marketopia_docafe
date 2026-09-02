@@ -26,25 +26,25 @@ class CategoryForm
                     ->columnSpanFull(),
                 Tabs::make('Translations')
                     ->tabs([
-                        Tab::make('English')->schema(self::translationFields('en')),
-                        Tab::make('العربية')->schema(self::translationFields('ar')),
+                        Tab::make(__('English content'))->schema(self::translationFields('en')),
+                        Tab::make(__('Arabic content'))->schema(self::translationFields('ar')),
                     ])
                     ->columnSpanFull(),
-                Section::make('Organization and publishing')
+                Section::make(__('Organization and publishing'))
                     ->columns(2)
                     ->schema([
                         Select::make('parent_id')
                             ->relationship('parent', 'id', ignoreRecord: true)
                             ->getOptionLabelFromRecordUsing(fn (Category $record): string => $record->name)
                             ->preload()
-                            ->placeholder('Top-level category'),
+                            ->placeholder(__('Top-level category')),
                         Select::make('status')->options([
-                            'draft' => 'Draft',
-                            'active' => 'Active',
-                            'archived' => 'Archived',
+                            'draft' => __('Draft'),
+                            'active' => __('Active'),
+                            'archived' => __('Archived'),
                         ])->required()->default('draft'),
                         TextInput::make('sort_order')->numeric()->minValue(0)->default(0)->required(),
-                        Toggle::make('is_featured')->label('Featured category'),
+                        Toggle::make('is_featured')->label(__('Featured')),
                     ]),
             ]);
     }
@@ -53,10 +53,10 @@ class CategoryForm
     private static function translationFields(string $locale): array
     {
         return [
-            TextInput::make("{$locale}.name")->label('Name')->required()->maxLength(255),
-            Textarea::make("{$locale}.description")->label('Description')->rows(5)->columnSpanFull(),
-            TextInput::make("{$locale}.meta_title")->label('SEO title')->maxLength(255),
-            Textarea::make("{$locale}.meta_description")->label('SEO description')->rows(3),
+            TextInput::make("{$locale}.name")->label(__('Name'))->required()->maxLength(255),
+            Textarea::make("{$locale}.description")->label(__('Description'))->rows(5)->columnSpanFull(),
+            TextInput::make("{$locale}.meta_title")->label(__('SEO title'))->maxLength(255),
+            Textarea::make("{$locale}.meta_description")->label(__('SEO description'))->rows(3),
         ];
     }
 }

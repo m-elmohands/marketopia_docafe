@@ -13,7 +13,7 @@ class OrderInfolist
     {
         return $schema
             ->components([
-                Section::make('Customer')
+                Section::make(__('Customer'))
                     ->columns(3)
                     ->schema([
                         TextEntry::make('customer_name'),
@@ -23,7 +23,7 @@ class OrderInfolist
                             ->getStateUsing(fn ($record): string => collect($record->shipping_address)->filter()->implode(', '))
                             ->columnSpanFull(),
                     ]),
-                Section::make('Totals')
+                Section::make(__('Totals'))
                     ->columns(5)
                     ->schema([
                         TextEntry::make('subtotal')->money(fn ($record): string => $record->currency, divideBy: 100),

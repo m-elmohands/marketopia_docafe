@@ -15,23 +15,23 @@ class SettingForm
     {
         return $schema
             ->components([
-                Section::make('Setting')
+                Section::make(__('Setting'))
                     ->columns(2)
                     ->schema([
                         TextInput::make('key')->required()->maxLength(255)->unique(ignoreRecord: true),
                         TextInput::make('group')->required()->default('general')->maxLength(255),
                         Select::make('type')->options([
-                            'string' => 'Text',
-                            'integer' => 'Integer',
-                            'boolean' => 'Boolean',
-                            'json' => 'JSON',
+                            'string' => __('Text'),
+                            'integer' => __('Integer'),
+                            'boolean' => __('Boolean'),
+                            'json' => __('JSON'),
                         ])->required()->default('string'),
-                        Toggle::make('is_public')->label('Publicly accessible'),
+                        Toggle::make('is_public')->label(__('Publicly accessible')),
                     ]),
-                Section::make('Localized values')
+                Section::make(__('Localized values'))
                     ->schema([
-                        Textarea::make('en.value')->label('English value')->rows(4),
-                        Textarea::make('ar.value')->label('القيمة بالعربية')->rows(4)->extraInputAttributes(['dir' => 'rtl']),
+                        Textarea::make('en.value')->label(__('English value'))->rows(4),
+                        Textarea::make('ar.value')->label(__('Arabic value'))->rows(4)->extraInputAttributes(['dir' => 'rtl']),
                     ]),
             ]);
     }

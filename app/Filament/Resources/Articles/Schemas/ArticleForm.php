@@ -27,21 +27,21 @@ class ArticleForm
                     ->columnSpanFull(),
                 Tabs::make('Translations')
                     ->tabs([
-                        Tab::make('English')->schema(self::translationFields('en')),
-                        Tab::make('العربية')->schema(self::translationFields('ar')),
+                        Tab::make(__('English content'))->schema(self::translationFields('en')),
+                        Tab::make(__('Arabic content'))->schema(self::translationFields('ar')),
                     ])
                     ->columnSpanFull(),
-                Section::make('Publishing')
+                Section::make(__('Publishing'))
                     ->columns(2)
                     ->schema([
                         Select::make('author_id')->relationship('author', 'name')->searchable()->preload(),
                         Select::make('status')->options([
-                            'draft' => 'Draft',
-                            'published' => 'Published',
-                            'archived' => 'Archived',
+                            'draft' => __('Draft'),
+                            'published' => __('Published'),
+                            'archived' => __('Archived'),
                         ])->required()->default('draft'),
                         DateTimePicker::make('published_at'),
-                        Toggle::make('is_featured')->label('Featured article'),
+                        Toggle::make('is_featured')->label(__('Featured')),
                     ]),
             ]);
     }
@@ -50,11 +50,11 @@ class ArticleForm
     private static function translationFields(string $locale): array
     {
         return [
-            TextInput::make("{$locale}.title")->label('Title')->required()->maxLength(255)->columnSpanFull(),
-            Textarea::make("{$locale}.excerpt")->label('Excerpt')->rows(3)->columnSpanFull(),
-            RichEditor::make("{$locale}.content")->label('Content')->required()->columnSpanFull(),
-            TextInput::make("{$locale}.meta_title")->label('SEO title')->maxLength(255),
-            Textarea::make("{$locale}.meta_description")->label('SEO description')->rows(3),
+            TextInput::make("{$locale}.title")->label(__('Title'))->required()->maxLength(255)->columnSpanFull(),
+            Textarea::make("{$locale}.excerpt")->label(__('Excerpt'))->rows(3)->columnSpanFull(),
+            RichEditor::make("{$locale}.content")->label(__('Content field'))->required()->columnSpanFull(),
+            TextInput::make("{$locale}.meta_title")->label(__('SEO title'))->maxLength(255),
+            Textarea::make("{$locale}.meta_description")->label(__('SEO description'))->rows(3),
         ];
     }
 }

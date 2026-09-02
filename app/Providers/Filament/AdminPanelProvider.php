@@ -2,6 +2,8 @@
 
 namespace App\Providers\Filament;
 
+use App\Http\Middleware\SetFilamentLocale;
+use Filament\Actions\Action;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -10,6 +12,7 @@ use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Filament\Support\Icons\Heroicon;
 use Filament\Widgets\AccountWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -29,6 +32,18 @@ class AdminPanelProvider extends PanelProvider
             ->strictAuthorization()
             ->login()
             ->profile(isSimple: false)
+            ->userMenuItems([
+                Action::make('language_english')
+                    ->label(fn (): string => __('English'))
+                    ->icon(Heroicon::Language)
+                    ->url(fn (): string => route('admin.locale', ['locale' => 'en']))
+                    ->visible(fn (): bool => app()->getLocale() !== 'en'),
+                Action::make('language_arabic')
+                    ->label(fn (): string => __('Arabic'))
+                    ->icon(Heroicon::Language)
+                    ->url(fn (): string => route('admin.locale', ['locale' => 'ar']))
+                    ->visible(fn (): bool => app()->getLocale() !== 'ar'),
+            ])
             ->colors([
                 'primary' => Color::Amber,
             ])
@@ -45,6 +60,7 @@ class AdminPanelProvider extends PanelProvider
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
                 StartSession::class,
+                SetFilamentLocale::class,
                 AuthenticateSession::class,
                 ShareErrorsFromSession::class,
                 PreventRequestForgery::class,

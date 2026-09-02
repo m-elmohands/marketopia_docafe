@@ -2,8 +2,6 @@
 
 namespace App\Filament\Resources\Articles;
 
-use App\Filament\Resources\Articles\Pages\CreateArticle;
-use App\Filament\Resources\Articles\Pages\EditArticle;
 use App\Filament\Resources\Articles\Pages\ListArticles;
 use App\Filament\Resources\Articles\Schemas\ArticleForm;
 use App\Filament\Resources\Articles\Tables\ArticlesTable;
@@ -24,9 +22,22 @@ class ArticleResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'id';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Content';
-
     protected static ?int $navigationSort = 1;
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('Content');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('Article');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('Articles');
+    }
 
     public static function form(Schema $schema): Schema
     {
@@ -49,8 +60,6 @@ class ArticleResource extends Resource
     {
         return [
             'index' => ListArticles::route('/'),
-            'create' => CreateArticle::route('/create'),
-            'edit' => EditArticle::route('/{record}/edit'),
         ];
     }
 

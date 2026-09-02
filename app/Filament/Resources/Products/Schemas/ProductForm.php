@@ -30,35 +30,35 @@ class ProductForm
                     ->columnSpanFull(),
                 Tabs::make('Translations')
                     ->tabs([
-                        Tab::make('English')->schema(self::translationFields('en')),
-                        Tab::make('العربية')->schema(self::translationFields('ar')),
+                        Tab::make(__('English content'))->schema(self::translationFields('en')),
+                        Tab::make(__('Arabic content'))->schema(self::translationFields('ar')),
                     ])
                     ->columnSpanFull(),
-                Section::make('Catalog and pricing')
-                    ->columns(3)
+                Section::make(__('Catalog and pricing'))
+                    ->columns(2)
                     ->schema([
                         TextInput::make('sku')->required()->maxLength(255)->unique(ignoreRecord: true),
                         TextInput::make('barcode')->maxLength(255)->unique(ignoreRecord: true),
                         Select::make('status')->options([
-                            'draft' => 'Draft',
-                            'active' => 'Active',
-                            'archived' => 'Archived',
+                            'draft' => __('Draft'),
+                            'active' => __('Active'),
+                            'archived' => __('Archived'),
                         ])->required()->default('draft'),
                         Select::make('categories')
                             ->relationship('categories', 'id')
                             ->getOptionLabelFromRecordUsing(fn (Category $record): string => $record->name)
                             ->multiple()
                             ->preload()
-                            ->label('Categories'),
+                            ->label(__('Categories')),
                         TextInput::make('price')->label('Price (minor units)')->numeric()->minValue(0)->required(),
                         TextInput::make('compare_at_price')->label('Compare-at price')->numeric()->minValue(0),
                         TextInput::make('cost_price')->label('Cost price')->numeric()->minValue(0),
                         Select::make('currency')->options(['EGP' => 'EGP', 'USD' => 'USD'])->required()->default('EGP'),
                         TextInput::make('weight_grams')->numeric()->minValue(0)->suffix('g'),
-                        Toggle::make('is_featured')->label('Featured product'),
+                        Toggle::make('is_featured')->label(__('Featured'))->columnSpanFull(),
                     ]),
-                Section::make('Inventory and publishing')
-                    ->columns(3)
+                Section::make(__('Inventory and publishing'))
+                    ->columns(2)
                     ->schema([
                         Toggle::make('track_inventory')->default(true)->live(),
                         TextInput::make('stock_quantity')->numeric()->minValue(0)->default(0),
@@ -73,9 +73,9 @@ class ProductForm
     private static function translationFields(string $locale): array
     {
         return [
-            TextInput::make("{$locale}.name")->label('Name')->required()->maxLength(255),
-            Textarea::make("{$locale}.short_description")->label('Short description')->rows(3)->columnSpanFull(),
-            Textarea::make("{$locale}.description")->label('Description')->rows(8)->columnSpanFull(),
+            TextInput::make("{$locale}.name")->label(__('Name'))->required()->maxLength(255),
+            Textarea::make("{$locale}.short_description")->label(__('Short description'))->rows(3)->columnSpanFull(),
+            Textarea::make("{$locale}.description")->label(__('Description'))->rows(8)->columnSpanFull(),
         ];
     }
 }

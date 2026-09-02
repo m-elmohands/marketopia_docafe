@@ -13,7 +13,7 @@ class UserForm
     {
         return $schema
             ->components([
-                Section::make('Account')
+                Section::make(__('Account'))
                     ->columns(2)
                     ->schema([
                         TextInput::make('name')->required()->maxLength(255),

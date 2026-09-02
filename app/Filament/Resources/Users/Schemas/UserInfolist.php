@@ -12,13 +12,13 @@ class UserInfolist
     {
         return $schema
             ->components([
-                Section::make('Account')
+                Section::make(__('Account'))
                     ->columns(2)
                     ->schema([
                         TextEntry::make('name'),
                         TextEntry::make('email')->copyable(),
                         TextEntry::make('roles.name')->badge(),
-                        TextEntry::make('email_verified_at')->dateTime()->placeholder('Not verified'),
+                        TextEntry::make('email_verified_at')->dateTime()->placeholder(__('Not verified')),
                         TextEntry::make('created_at')->dateTime(),
                     ]),
             ]);

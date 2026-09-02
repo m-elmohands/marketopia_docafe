@@ -13,26 +13,26 @@ class OrderForm
     {
         return $schema
             ->components([
-                Section::make('Order workflow')
+                Section::make(__('Order workflow'))
                     ->columns(3)
                     ->schema([
                         Select::make('status')->options([
-                            'pending' => 'Pending',
-                            'processing' => 'Processing',
-                            'completed' => 'Completed',
-                            'cancelled' => 'Cancelled',
+                            'pending' => __('Pending'),
+                            'processing' => __('Processing'),
+                            'completed' => __('Completed'),
+                            'cancelled' => __('Cancelled'),
                         ])->required(),
                         Select::make('payment_status')->options([
-                            'pending' => 'Pending',
-                            'paid' => 'Paid',
-                            'failed' => 'Failed',
-                            'refunded' => 'Refunded',
+                            'pending' => __('Pending'),
+                            'paid' => __('Paid'),
+                            'failed' => __('Failed'),
+                            'refunded' => __('Refunded'),
                         ])->required(),
                         Select::make('fulfillment_status')->options([
-                            'unfulfilled' => 'Unfulfilled',
-                            'processing' => 'Processing',
-                            'fulfilled' => 'Fulfilled',
-                            'returned' => 'Returned',
+                            'unfulfilled' => __('Unfulfilled'),
+                            'processing' => __('Processing'),
+                            'fulfilled' => __('Fulfilled'),
+                            'returned' => __('Returned'),
                         ])->required(),
                         Textarea::make('admin_notes')->rows(5)->columnSpanFull(),
                     ]),

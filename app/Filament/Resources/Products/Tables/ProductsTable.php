@@ -2,7 +2,9 @@
 
 namespace App\Filament\Resources\Products\Tables;
 
+use App\Models\Product;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
@@ -42,7 +44,13 @@ class ProductsTable
                 TrashedFilter::make(),
             ])
             ->recordActions([
-                EditAction::make(),
+                EditAction::make()
+                    ->mutateRecordDataUsing(fn (array $data, Product $record): array => self::withTranslations(
+                        $data,
+                        $record,
+                        ['name', 'short_description', 'description'],
+                    )),
+                DeleteAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
@@ -51,5 +59,15 @@ class ProductsTable
                     RestoreBulkAction::make(),
                 ]),
             ]);
+    }
+
+    /** @param list<string> $attributes */
+    private static function withTranslations(array $data, Product $record, array $attributes): array
+    {
+        foreach (['en', 'ar'] as $locale) {
+            $data[$locale] = $record->translate($locale)?->only($attributes) ?? [];
+        }
+
+        return $data;
     }
 }

@@ -21,9 +21,22 @@ class PaymentTransactionResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'paymob_transaction_id';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Sales';
-
     protected static ?int $navigationSort = 2;
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('Sales');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('Payment transaction');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('Payment transactions');
+    }
 
     public static function infolist(Schema $schema): Schema
     {

@@ -21,9 +21,22 @@ class PaymentRefundResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'paymob_transaction_id';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Sales';
-
     protected static ?int $navigationSort = 3;
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('Sales');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('Payment refund');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('Payment refunds');
+    }
 
     public static function infolist(Schema $schema): Schema
     {

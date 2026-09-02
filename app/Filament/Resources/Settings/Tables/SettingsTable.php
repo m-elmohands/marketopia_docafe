@@ -31,7 +31,14 @@ class SettingsTable
                     ->all()),
             ])
             ->recordActions([
-                EditAction::make(),
+                EditAction::make()
+                    ->mutateRecordDataUsing(function (array $data, Setting $record): array {
+                        foreach (['en', 'ar'] as $locale) {
+                            $data[$locale] = $record->translate($locale)?->only(['value']) ?? [];
+                        }
+
+                        return $data;
+                    }),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
