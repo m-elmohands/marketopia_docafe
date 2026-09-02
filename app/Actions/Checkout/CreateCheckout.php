@@ -27,14 +27,6 @@ class CreateCheckout
 
     public function execute(User $user, array $data): array
     {
-        $existing = Order::query()->where('user_id', $user->id)->where('idempotency_key', $data['idempotency_key'])->first();
-
-        if ($existing) {
-            $intention = $existing->paymentIntentions()->latest()->first();
-
-            return ['order' => $existing->load('items'), 'checkout_url' => $intention?->provider_data['checkout_url'] ?? null];
-        }
-
         $order = DB::transaction(function () use ($user, $data): Order {
             $cart = Cart::query()->where('user_id', $user->id)->with('items')->lockForUpdate()->first();
 
@@ -57,7 +49,7 @@ class CreateCheckout
 
             $order = Order::create([
                 'order_number' => 'DC-'.now()->format('ymd').'-'.Str::upper(Str::random(8)),
-                'idempotency_key' => $data['idempotency_key'],
+                'idempotency_key' => (string) Str::uuid(),
                 'user_id' => $user->id,
                 'status' => OrderStatus::Pending,
                 'payment_status' => PaymentStatus::Pending,

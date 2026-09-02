@@ -11,6 +11,7 @@ class OrderResource extends ApiResource
         return [
             'id' => $this->id,
             'order_number' => $this->order_number,
+            'idempotency_key' => $this->idempotency_key,
             'status' => $this->status->value,
             'payment_status' => $this->payment_status->value,
             'fulfillment_status' => $this->fulfillment_status->value,

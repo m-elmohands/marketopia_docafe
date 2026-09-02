@@ -30,18 +30,20 @@ class ApiDocumentationTest extends TestCase
 
     public function test_postman_collection_is_served_inline_as_valid_json(): void
     {
-        $response = $this->get('/api/postman-collection')
+        config()->set('app.url', 'https://cafe.example.com/');
+
+        $response = $this->getJson('/api/postman-collection')
             ->assertOk()
-            ->assertHeader('content-type', 'application/json; charset=UTF-8')
+            ->assertHeader('content-type', 'application/json')
             ->assertHeader('content-disposition', 'inline');
 
-        $collection = json_decode(
-            file_get_contents($response->baseResponse->getFile()->getRealPath()),
-            true,
-            flags: JSON_THROW_ON_ERROR,
-        );
+        $collection = $response->json();
 
         $this->assertSame('Do Cafe Ecommerce API', $collection['info']['name']);
         $this->assertNotEmpty($collection['item']);
+        $this->assertSame(
+            'https://cafe.example.com/api/v1',
+            collect($collection['variable'])->firstWhere('key', 'base_url')['value'],
+        );
     }
 }

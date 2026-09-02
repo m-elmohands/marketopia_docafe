@@ -115,5 +115,15 @@
     "Unauthenticated.": "Unauthenticated.",
     "Forbidden.": "Forbidden.",
     "Resource not found.": "Resource not found.",
-    "Request failed.": "Request failed."
+    "Request failed.": "Request failed.",
+    "Untitled record": "Untitled record",
+    "Payment result": "Payment result",
+    "Payment completed successfully": "Payment completed successfully",
+    "Your order has been received and is being processed.": "Your order has been received and is being processed.",
+    "Payment is being processed": "Payment is being processed",
+    "Please check your order again shortly.": "Please check your order again shortly.",
+    "Payment was not completed": "Payment was not completed",
+    "Invalid payment response": "Invalid payment response",
+    "Your order remains unpaid.": "Your order remains unpaid.",
+    "The payment response signature could not be verified.": "The payment response signature could not be verified."
 }

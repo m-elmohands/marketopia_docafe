@@ -10,14 +10,13 @@ use Database\Seeders\CoffeeCatalogSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class EcommerceApiTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_customer_can_register_manage_cart_and_create_an_idempotent_paymob_checkout(): void
+    public function test_customer_can_register_manage_cart_and_create_paymob_checkout_with_a_backend_generated_idempotency_key(): void
     {
         $this->seed(CoffeeCatalogSeeder::class);
         $product = Product::query()->firstOrFail();
@@ -53,7 +52,6 @@ class EcommerceApiTest extends TestCase
         ])->assertCreated()->assertJsonPath('data.items_count', 2);
 
         $payload = [
-            'idempotency_key' => (string) Str::uuid(),
             'customer_name' => 'Ahmed Ali',
             'customer_email' => 'customer@example.com',
             'customer_phone' => '+201001234567',
@@ -68,18 +66,14 @@ class EcommerceApiTest extends TestCase
 
         $checkout = $this->withHeaders($headers)->postJson('/api/v1/checkout', $payload)
             ->assertCreated()
-            ->assertJsonPath('data.order.payment_status', 'pending');
+            ->assertJsonPath('data.order.payment_status', 'pending')
+            ->assertJsonPath('data.order.idempotency_key', Order::query()->firstOrFail()->idempotency_key);
 
         $this->assertStringContainsString('clientSecret=client-secret', $checkout->json('data.checkout_url'));
         $this->assertSame(3, $product->fresh()->stock_quantity);
         $this->assertDatabaseCount('orders', 1);
         $this->assertDatabaseMissing('cart_items', ['product_id' => $product->id]);
-
-        $this->withHeaders($headers)->postJson('/api/v1/checkout', $payload)
-            ->assertCreated()
-            ->assertJsonPath('data.order.id', $checkout->json('data.order.id'));
-
-        $this->assertDatabaseCount('orders', 1);
+        $this->assertNotNull(Order::query()->firstOrFail()->idempotency_key);
         Http::assertSentCount(1);
     }
 

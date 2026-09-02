@@ -77,10 +77,9 @@
                 {
                     "name": "Create Checkout",
                     "event": [
-                        {"listen": "prerequest", "script": {"type": "text/javascript", "exec": ["pm.variables.set('idempotency_key', pm.variables.replaceIn('{{$guid}}'));"]}},
                         {"listen": "test", "script": {"type": "text/javascript", "exec": ["const body = pm.response.json();", "if (body.data && body.data.order) pm.collectionVariables.set('order_id', body.data.order.id);"]}}
                     ],
-                    "request": {"method": "POST", "header": [{"key": "Accept", "value": "application/json"}, {"key": "Accept-Language", "value": "{{locale}}"}], "body": {"mode": "raw", "raw": "{\n  \"idempotency_key\": \"{{idempotency_key}}\",\n  \"customer_name\": \"Coffee Customer\",\n  \"customer_email\": \"{{email}}\",\n  \"customer_phone\": \"+201001234567\",\n  \"shipping_address\": {\n    \"building\": \"10\",\n    \"street\": \"Tahrir Street\",\n    \"city\": \"Cairo\",\n    \"country\": \"EG\"\n  },\n  \"payment_method\": \"paymob\"\n}", "options": {"raw": {"language": "json"}}}, "url": "{{base_url}}/checkout"}
+                    "request": {"method": "POST", "header": [{"key": "Accept", "value": "application/json"}, {"key": "Accept-Language", "value": "{{locale}}"}], "body": {"mode": "raw", "raw": "{\n  \"customer_name\": \"Coffee Customer\",\n  \"customer_email\": \"{{email}}\",\n  \"customer_phone\": \"+201001234567\",\n  \"shipping_address\": {\n    \"building\": \"10\",\n    \"street\": \"Tahrir Street\",\n    \"city\": \"Cairo\",\n    \"country\": \"EG\"\n  },\n  \"payment_method\": \"paymob\"\n}", "options": {"raw": {"language": "json"}}}, "url": "{{base_url}}/checkout"}
                 },
                 {"name": "List Orders", "request": {"method": "GET", "header": [{"key": "Accept", "value": "application/json"}], "url": "{{base_url}}/orders"}},
                 {"name": "Show Order", "request": {"method": "GET", "header": [{"key": "Accept", "value": "application/json"}], "url": "{{base_url}}/orders/{{order_id}}"}}

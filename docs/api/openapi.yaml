@@ -51,7 +51,7 @@ paths:
     delete: {$ref: '#/components/pathItems/authenticated'}
   /checkout:
     post:
-      summary: Create an idempotent order and Paymob Unified Checkout URL
+      summary: Create an order with a backend-generated idempotency key and Paymob Unified Checkout URL
       security: [{bearerAuth: []}]
       requestBody:
         required: true
@@ -120,9 +120,8 @@ components:
         device_name: {type: string}
     checkout:
       type: object
-      required: [idempotency_key, customer_name, customer_email, customer_phone, shipping_address, payment_method]
+      required: [customer_name, customer_email, customer_phone, shipping_address, payment_method]
       properties:
-        idempotency_key: {type: string, format: uuid}
         customer_name: {type: string}
         customer_email: {type: string, format: email}
         customer_phone: {type: string}

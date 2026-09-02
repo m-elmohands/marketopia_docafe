@@ -115,5 +115,15 @@
     "Unauthenticated.": "يجب تسجيل الدخول.",
     "Forbidden.": "غير مصرح بتنفيذ هذا الإجراء.",
     "Resource not found.": "المورد المطلوب غير موجود.",
-    "Request failed.": "تعذر تنفيذ الطلب."
+    "Request failed.": "تعذر تنفيذ الطلب.",
+    "Untitled record": "سجل بلا عنوان",
+    "Payment result": "نتيجة الدفع",
+    "Payment completed successfully": "تم الدفع بنجاح",
+    "Your order has been received and is being processed.": "تم استلام طلبك وجارٍ تجهيزه.",
+    "Payment is being processed": "جارٍ معالجة الدفع",
+    "Please check your order again shortly.": "يرجى مراجعة طلبك مرة أخرى بعد قليل.",
+    "Payment was not completed": "لم تكتمل عملية الدفع",
+    "Invalid payment response": "استجابة الدفع غير صالحة",
+    "Your order remains unpaid.": "لا يزال طلبك غير مدفوع.",
+    "The payment response signature could not be verified.": "تعذر التحقق من توقيع استجابة الدفع."
 }

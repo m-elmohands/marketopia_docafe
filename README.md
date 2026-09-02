@@ -2,12 +2,12 @@
 
 ## Do Cafe Ecommerce API
 
-The `/api/v1` API provides Sanctum customer authentication, localized catalog and articles, persistent carts, stock-safe checkout, orders, and Paymob Unified Checkout. Send `Accept-Language: en` or `ar`, use integer minor units for money, and send a stable UUID `idempotency_key` for each checkout attempt.
+The `/api/v1` API provides Sanctum customer authentication, localized catalog and articles, persistent carts, stock-safe checkout, orders, and Paymob Unified Checkout. Send `Accept-Language: en` or `ar` and use integer minor units for money. Checkout idempotency keys are generated automatically by the backend.
 
 Configure the `PAYMOB_*` variables from `.env.example` and point the Paymob transaction callback to `PAYMOB_NOTIFICATION_URL`. The API contract is documented in [`docs/api/openapi.yaml`](docs/api/openapi.yaml).
 
 Interactive API documentation is available at `/api/documentation`, and the raw specification is served from `/api/openapi.yaml`.
-The import-ready Postman collection URL is `/api/postman-collection`; Postman can import this URL directly.
+The import-ready Postman collection URL is `/api/postman-collection`; Postman can import this URL directly, and its `base_url` is generated from `APP_URL`.
 
 <p align="center">
 <a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>

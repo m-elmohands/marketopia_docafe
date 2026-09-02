@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\PostmanCollectionController;
 use App\Http\Controllers\Api\V1\ArticleController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CartController;
@@ -18,15 +19,7 @@ Route::get('openapi.yaml', function () {
         'Content-Disposition' => 'inline; filename="openapi.yaml"',
     ]);
 })->name('api.openapi');
-Route::get('postman-collection', function () {
-    return response()->file(
-        base_path('docs/api/do-cafe.postman_collection.json'),
-        [
-            'Content-Type' => 'application/json; charset=UTF-8',
-            'Content-Disposition' => 'inline',
-        ],
-    );
-})->name('api.postman');
+Route::get('postman-collection', PostmanCollectionController::class)->name('api.postman');
 
 Route::prefix('v1')->name('api.v1.')->middleware(['api.locale', 'throttle:api'])->group(function (): void {
     Route::post('auth/register', [AuthController::class, 'register'])->name('auth.register');

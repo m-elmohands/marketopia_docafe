@@ -18,8 +18,6 @@
 <body>
     <nav class="documentation-links" aria-label="API documentation downloads">
         <a href="{{ route('api.postman') }}">Open Postman collection URL</a>
-        &middot;
-        <a href="{{ route('api.openapi') }}">Download OpenAPI specification</a>
     </nav>
     <div id="swagger-ui"></div>
     <noscript>JavaScript is required to display the interactive API documentation.</noscript>

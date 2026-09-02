@@ -15,7 +15,6 @@ class CheckoutRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'idempotency_key' => ['required', 'uuid'],
             'customer_name' => ['required', 'string', 'max:255'],
             'customer_email' => ['required', 'email', 'max:255'],
             'customer_phone' => ['required', 'string', 'regex:/^\+?[0-9]{8,15}$/'],

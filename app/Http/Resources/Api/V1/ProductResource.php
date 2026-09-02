@@ -24,7 +24,7 @@ class ProductResource extends ApiResource
             'stock_quantity' => $this->when($request->user()?->can('products.viewAny'), $this->stock_quantity),
             'is_featured' => $this->is_featured,
             'image_url' => $this->getFirstMediaUrl('product-images') ?: null,
-            'images' => $this->whenLoaded('media', fn () => $this->getMedia('product-images')->map->getUrl()->values()),
+            'gallery' => $this->whenLoaded('media', fn () => $this->getMedia('product-images')->map->getUrl()->values()),
             'categories' => CategoryResource::collection($this->whenLoaded('categories')),
             'stages' => ProductStageResource::collection($this->whenLoaded('stages')),
         ];

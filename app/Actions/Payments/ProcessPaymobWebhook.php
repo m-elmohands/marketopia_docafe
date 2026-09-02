@@ -81,7 +81,7 @@ class ProcessPaymobWebhook
                     'is_voided' => filter_var($object['is_voided'] ?? false, FILTER_VALIDATE_BOOL),
                     'is_refunded' => filter_var($object['is_refunded'] ?? false, FILTER_VALIDATE_BOOL),
                     'is_3d_secure' => filter_var($object['is_3d_secure'] ?? false, FILTER_VALIDATE_BOOL),
-                    'error_message' => $object['data.message'] ?? null,
+                    'error_message' => Arr::get($object, 'data.message'),
                     'provider_data' => $object,
                     'processed_at' => now(),
                 ],

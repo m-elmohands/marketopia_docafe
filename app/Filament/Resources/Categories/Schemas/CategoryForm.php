@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Categories\Schemas;
 
 use App\Enums\CatalogStatus;
+use App\Filament\Support\LocalizedRecordLabel;
 use App\Filament\Support\LocalizedTabs;
 use App\Models\Category;
 use Filament\Forms\Components\Select;
@@ -31,7 +32,7 @@ class CategoryForm
                     ->schema([
                         Select::make('parent_id')
                             ->relationship('parent', 'id', ignoreRecord: true)
-                            ->getOptionLabelFromRecordUsing(fn (Category $record): string => $record->name)
+                            ->getOptionLabelFromRecordUsing(fn (Category $record): string => LocalizedRecordLabel::get($record, 'name'))
                             ->preload()
                             ->placeholder(__('Top-level category')),
                         Select::make('status')->options(CatalogStatus::class)->required()->default(CatalogStatus::Draft->value),

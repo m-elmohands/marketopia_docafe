@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Products\Schemas;
 
 use App\Enums\CatalogStatus;
 use App\Enums\Currency;
+use App\Filament\Support\LocalizedRecordLabel;
 use App\Filament\Support\LocalizedTabs;
 use App\Models\Category;
 use Filament\Forms\Components\DateTimePicker;
@@ -41,7 +42,7 @@ class ProductForm
                         Select::make('status')->options(CatalogStatus::class)->required()->default(CatalogStatus::Draft->value),
                         Select::make('categories')
                             ->relationship('categories', 'id')
-                            ->getOptionLabelFromRecordUsing(fn (Category $record): string => $record->name)
+                            ->getOptionLabelFromRecordUsing(fn (Category $record): string => LocalizedRecordLabel::get($record, 'name'))
                             ->multiple()
                             ->preload()
                             ->label(__('Categories')),
