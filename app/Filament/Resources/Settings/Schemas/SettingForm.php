@@ -2,11 +2,10 @@
 
 namespace App\Filament\Resources\Settings\Schemas;
 
+use App\Filament\Support\LocalizedTabs;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
-use Filament\Schemas\Components\Tabs;
-use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Schema;
 
 class SettingForm
@@ -17,17 +16,16 @@ class SettingForm
             ->components([
                 Section::make(__('Café identity'))
                     ->schema([
-                        Tabs::make('Translations / الترجمات')
-                            ->tabs([
-                                Tab::make('English')->extraAttributes(['dir' => 'ltr'])->schema([
-                                    TextInput::make('identity.en.name')->label('Café name')->required()->maxLength(255),
-                                    Textarea::make('identity.en.description')->label('Café description')->rows(4),
-                                ]),
-                                Tab::make('العربية')->extraAttributes(['dir' => 'rtl'])->schema([
-                                    TextInput::make('identity.ar.name')->label('اسم المقهى')->required()->maxLength(255)->extraInputAttributes(['dir' => 'rtl']),
-                                    Textarea::make('identity.ar.description')->label('وصف المقهى')->rows(4)->extraInputAttributes(['dir' => 'rtl']),
-                                ]),
-                            ]),
+                        LocalizedTabs::make(
+                            [
+                                TextInput::make('identity.en.name')->label('Café name')->required()->maxLength(255),
+                                Textarea::make('identity.en.description')->label('Café description')->rows(4),
+                            ],
+                            [
+                                TextInput::make('identity.ar.name')->label('اسم المقهى')->required()->maxLength(255)->extraInputAttributes(LocalizedTabs::direction('ar')),
+                                Textarea::make('identity.ar.description')->label('وصف المقهى')->rows(4)->extraInputAttributes(LocalizedTabs::direction('ar')),
+                            ],
+                        ),
                     ]),
                 Section::make(__('Contact information'))
                     ->columns(2)
@@ -35,7 +33,7 @@ class SettingForm
                         TextInput::make('contact.email')->label(__('Email address'))->email()->required()->maxLength(255),
                         TextInput::make('contact.phone')->label(__('Phone number'))->tel()->required()->maxLength(30),
                         Textarea::make('contact.en_address')->label(__('Address in English'))->rows(3),
-                        Textarea::make('contact.ar_address')->label(__('Address in Arabic'))->rows(3)->extraInputAttributes(['dir' => 'rtl']),
+                        Textarea::make('contact.ar_address')->label(__('Address in Arabic'))->rows(3)->extraInputAttributes(LocalizedTabs::direction('ar')),
                     ]),
                 Section::make(__('Commerce'))
                     ->columns(2)

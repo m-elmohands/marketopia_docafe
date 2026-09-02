@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Products\Schemas;
 
 use App\Enums\CatalogStatus;
 use App\Enums\Currency;
+use App\Filament\Support\LocalizedTabs;
 use App\Models\Category;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\KeyValue;
@@ -14,8 +15,6 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
-use Filament\Schemas\Components\Tabs;
-use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -32,11 +31,7 @@ class ProductForm
                     ->reorderable()
                     ->imageEditor()
                     ->columnSpanFull(),
-                Tabs::make('Translations / الترجمات')
-                    ->tabs([
-                        Tab::make('English')->extraAttributes(['dir' => 'ltr'])->schema(self::translationFields('en')),
-                        Tab::make('العربية')->extraAttributes(['dir' => 'rtl'])->schema(self::translationFields('ar')),
-                    ])
+                LocalizedTabs::make(self::translationFields('en'), self::translationFields('ar'))
                     ->columnSpanFull(),
                 Section::make(__('Catalog and pricing'))
                     ->columns(2)
@@ -86,31 +81,10 @@ class ProductForm
                                     ->image()
                                     ->imageEditor()
                                     ->columnSpanFull(),
-                                Tabs::make('Translations / الترجمات')
-                                    ->tabs([
-                                        Tab::make('English')->extraAttributes(['dir' => 'ltr'])->schema([
-                                            TextInput::make('en.title')
-                                                ->label('Title')
-                                                ->required()
-                                                ->maxLength(255)
-                                                ->extraInputAttributes(['dir' => 'ltr']),
-                                            Textarea::make('en.description')
-                                                ->label('Description')
-                                                ->rows(4)
-                                                ->extraInputAttributes(['dir' => 'ltr']),
-                                        ]),
-                                        Tab::make('العربية')->extraAttributes(['dir' => 'rtl'])->schema([
-                                            TextInput::make('ar.title')
-                                                ->label('العنوان')
-                                                ->required()
-                                                ->maxLength(255)
-                                                ->extraInputAttributes(['dir' => 'rtl']),
-                                            Textarea::make('ar.description')
-                                                ->label('الوصف')
-                                                ->rows(4)
-                                                ->extraInputAttributes(['dir' => 'rtl']),
-                                        ]),
-                                    ]),
+                                LocalizedTabs::make(
+                                    self::stageTranslationFields('en'),
+                                    self::stageTranslationFields('ar'),
+                                ),
                             ])
                             ->columnSpanFull(),
                     ])->columnSpanFull(),
@@ -120,15 +94,30 @@ class ProductForm
     /** @return array<int, TextInput|Textarea> */
     private static function translationFields(string $locale): array
     {
-        $labels = $locale === 'ar'
-            ? ['name' => 'الاسم', 'short_description' => 'الوصف المختصر', 'description' => 'الوصف']
-            : ['name' => 'Name', 'short_description' => 'Short description', 'description' => 'Description'];
-        $direction = ['dir' => $locale === 'ar' ? 'rtl' : 'ltr'];
+        $direction = LocalizedTabs::direction($locale);
 
         return [
-            TextInput::make("{$locale}.name")->label($labels['name'])->required()->maxLength(255)->extraInputAttributes($direction),
-            Textarea::make("{$locale}.short_description")->label($labels['short_description'])->rows(3)->columnSpanFull()->extraInputAttributes($direction),
-            Textarea::make("{$locale}.description")->label($labels['description'])->rows(8)->columnSpanFull()->extraInputAttributes($direction),
+            TextInput::make("{$locale}.name")->label(LocalizedTabs::label($locale, 'Name', 'الاسم'))->required()->maxLength(255)->extraInputAttributes($direction),
+            Textarea::make("{$locale}.short_description")->label(LocalizedTabs::label($locale, 'Short description', 'الوصف المختصر'))->rows(3)->columnSpanFull()->extraInputAttributes($direction),
+            Textarea::make("{$locale}.description")->label(LocalizedTabs::label($locale, 'Description', 'الوصف'))->rows(8)->columnSpanFull()->extraInputAttributes($direction),
+        ];
+    }
+
+    /** @return array<int, TextInput|Textarea> */
+    private static function stageTranslationFields(string $locale): array
+    {
+        $direction = LocalizedTabs::direction($locale);
+
+        return [
+            TextInput::make("{$locale}.title")
+                ->label(LocalizedTabs::label($locale, 'Title', 'العنوان'))
+                ->required()
+                ->maxLength(255)
+                ->extraInputAttributes($direction),
+            Textarea::make("{$locale}.description")
+                ->label(LocalizedTabs::label($locale, 'Description', 'الوصف'))
+                ->rows(4)
+                ->extraInputAttributes($direction),
         ];
     }
 }
