@@ -30,10 +30,10 @@ class ProductForm
                     ->reorderable()
                     ->imageEditor()
                     ->columnSpanFull(),
-                Tabs::make('Translations')
+                Tabs::make('Translations / الترجمات')
                     ->tabs([
-                        Tab::make(__('English content'))->schema(self::translationFields('en')),
-                        Tab::make(__('Arabic content'))->schema(self::translationFields('ar')),
+                        Tab::make('English')->schema(self::translationFields('en')),
+                        Tab::make('العربية')->schema(self::translationFields('ar')),
                     ])
                     ->columnSpanFull(),
                 Section::make(__('Catalog and pricing'))
@@ -70,10 +70,15 @@ class ProductForm
     /** @return array<int, TextInput|Textarea> */
     private static function translationFields(string $locale): array
     {
+        $labels = $locale === 'ar'
+            ? ['name' => 'الاسم', 'short_description' => 'الوصف المختصر', 'description' => 'الوصف']
+            : ['name' => 'Name', 'short_description' => 'Short description', 'description' => 'Description'];
+        $direction = ['dir' => $locale === 'ar' ? 'rtl' : 'ltr'];
+
         return [
-            TextInput::make("{$locale}.name")->label(__('Name'))->required()->maxLength(255),
-            Textarea::make("{$locale}.short_description")->label(__('Short description'))->rows(3)->columnSpanFull(),
-            Textarea::make("{$locale}.description")->label(__('Description'))->rows(8)->columnSpanFull(),
+            TextInput::make("{$locale}.name")->label($labels['name'])->required()->maxLength(255)->extraInputAttributes($direction),
+            Textarea::make("{$locale}.short_description")->label($labels['short_description'])->rows(3)->columnSpanFull()->extraInputAttributes($direction),
+            Textarea::make("{$locale}.description")->label($labels['description'])->rows(8)->columnSpanFull()->extraInputAttributes($direction),
         ];
     }
 }

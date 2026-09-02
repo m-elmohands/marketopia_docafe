@@ -26,10 +26,10 @@ class ArticleForm
                     ->image()
                     ->imageEditor()
                     ->columnSpanFull(),
-                Tabs::make('Translations')
+                Tabs::make('Translations / الترجمات')
                     ->tabs([
-                        Tab::make(__('English content'))->schema(self::translationFields('en')),
-                        Tab::make(__('Arabic content'))->schema(self::translationFields('ar')),
+                        Tab::make('English')->schema(self::translationFields('en')),
+                        Tab::make('العربية')->schema(self::translationFields('ar')),
                     ])
                     ->columnSpanFull(),
                 Section::make(__('Publishing'))
@@ -46,12 +46,29 @@ class ArticleForm
     /** @return array<int, TextInput|Textarea|RichEditor> */
     private static function translationFields(string $locale): array
     {
+        $labels = $locale === 'ar'
+            ? [
+                'title' => 'العنوان',
+                'excerpt' => 'المقتطف',
+                'content' => 'المحتوى',
+                'meta_title' => 'عنوان تحسين محركات البحث',
+                'meta_description' => 'وصف تحسين محركات البحث',
+            ]
+            : [
+                'title' => 'Title',
+                'excerpt' => 'Excerpt',
+                'content' => 'Content',
+                'meta_title' => 'SEO title',
+                'meta_description' => 'SEO description',
+            ];
+        $direction = ['dir' => $locale === 'ar' ? 'rtl' : 'ltr'];
+
         return [
-            TextInput::make("{$locale}.title")->label(__('Title'))->required()->maxLength(255)->columnSpanFull(),
-            Textarea::make("{$locale}.excerpt")->label(__('Excerpt'))->rows(3)->columnSpanFull(),
-            RichEditor::make("{$locale}.content")->label(__('Content field'))->required()->columnSpanFull(),
-            TextInput::make("{$locale}.meta_title")->label(__('SEO title'))->maxLength(255),
-            Textarea::make("{$locale}.meta_description")->label(__('SEO description'))->rows(3),
+            TextInput::make("{$locale}.title")->label($labels['title'])->required()->maxLength(255)->columnSpanFull()->extraInputAttributes($direction),
+            Textarea::make("{$locale}.excerpt")->label($labels['excerpt'])->rows(3)->columnSpanFull()->extraInputAttributes($direction),
+            RichEditor::make("{$locale}.content")->label($labels['content'])->required()->columnSpanFull()->extraInputAttributes($direction),
+            TextInput::make("{$locale}.meta_title")->label($labels['meta_title'])->maxLength(255)->extraInputAttributes($direction),
+            Textarea::make("{$locale}.meta_description")->label($labels['meta_description'])->rows(3)->extraInputAttributes($direction),
         ];
     }
 }

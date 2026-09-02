@@ -43,12 +43,16 @@ class ProductsTable
                         $record,
                         ['name', 'short_description', 'description'],
                     )),
-                DeleteAction::make(),
+                DeleteAction::make()->authorizationNotification(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                    ForceDeleteBulkAction::make(),
+                    DeleteBulkAction::make()
+                        ->authorizeIndividualRecords('delete')
+                        ->failureNotificationTitle(__('A product included in an order cannot be deleted.')),
+                    ForceDeleteBulkAction::make()
+                        ->authorizeIndividualRecords('forceDelete')
+                        ->failureNotificationTitle(__('A product included in an order cannot be deleted.')),
                     RestoreBulkAction::make(),
                 ]),
             ]);

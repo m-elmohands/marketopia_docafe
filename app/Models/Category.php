@@ -50,6 +50,14 @@ class Category extends Model implements HasMedia, TranslatableContract
                 $parentId = self::withTrashed()->whereKey($parentId)->value('parent_id');
             }
         });
+
+        static::deleting(function (self $category): void {
+            if (! $category->canBeDeleted()) {
+                throw ValidationException::withMessages([
+                    'category' => __('A category containing products cannot be deleted.'),
+                ]);
+            }
+        });
     }
 
     public function parent(): BelongsTo
@@ -65,6 +73,11 @@ class Category extends Model implements HasMedia, TranslatableContract
     public function products(): BelongsToMany
     {
         return $this->belongsToMany(Product::class)->withTimestamps();
+    }
+
+    public function canBeDeleted(): bool
+    {
+        return ! $this->products()->withTrashed()->exists();
     }
 
     protected function casts(): array

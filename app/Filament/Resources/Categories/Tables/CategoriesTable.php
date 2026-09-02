@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Categories\Tables;
 use App\Enums\CatalogStatus;
 use App\Models\Category;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
@@ -42,11 +43,16 @@ class CategoriesTable
                         $record,
                         ['name', 'description', 'meta_title', 'meta_description'],
                     )),
+                DeleteAction::make()->authorizationNotification(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                    ForceDeleteBulkAction::make(),
+                    DeleteBulkAction::make()
+                        ->authorizeIndividualRecords('delete')
+                        ->failureNotificationTitle(__('A category containing products cannot be deleted.')),
+                    ForceDeleteBulkAction::make()
+                        ->authorizeIndividualRecords('forceDelete')
+                        ->failureNotificationTitle(__('A category containing products cannot be deleted.')),
                     RestoreBulkAction::make(),
                 ]),
             ]);

@@ -2,12 +2,11 @@
 
 namespace App\Filament\Resources\Settings\Schemas;
 
-use App\Enums\SettingType;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Schema;
 
 class SettingForm
@@ -16,18 +15,39 @@ class SettingForm
     {
         return $schema
             ->components([
-                Section::make(__('Setting'))
+                Section::make(__('Café identity'))
+                    ->schema([
+                        Tabs::make('Translations / الترجمات')
+                            ->tabs([
+                                Tab::make('English')->schema([
+                                    TextInput::make('identity.en.name')->label('Café name')->required()->maxLength(255),
+                                    Textarea::make('identity.en.description')->label('Café description')->rows(4),
+                                ]),
+                                Tab::make('العربية')->schema([
+                                    TextInput::make('identity.ar.name')->label('اسم المقهى')->required()->maxLength(255)->extraInputAttributes(['dir' => 'rtl']),
+                                    Textarea::make('identity.ar.description')->label('وصف المقهى')->rows(4)->extraInputAttributes(['dir' => 'rtl']),
+                                ]),
+                            ]),
+                    ]),
+                Section::make(__('Contact information'))
                     ->columns(2)
                     ->schema([
-                        TextInput::make('key')->required()->maxLength(255)->unique(ignoreRecord: true),
-                        TextInput::make('group')->required()->default('general')->maxLength(255),
-                        Select::make('type')->options(SettingType::class)->required()->default(SettingType::String->value),
-                        Toggle::make('is_public')->label(__('Publicly accessible')),
+                        TextInput::make('contact.email')->label(__('Email address'))->email()->required()->maxLength(255),
+                        TextInput::make('contact.phone')->label(__('Phone number'))->tel()->required()->maxLength(30),
+                        Textarea::make('contact.en_address')->label(__('Address in English'))->rows(3),
+                        Textarea::make('contact.ar_address')->label(__('Address in Arabic'))->rows(3)->extraInputAttributes(['dir' => 'rtl']),
                     ]),
-                Section::make(__('Localized values'))
+                Section::make(__('Commerce'))
+                    ->columns(2)
                     ->schema([
-                        Textarea::make('en.value')->label(__('English value'))->rows(4),
-                        Textarea::make('ar.value')->label(__('Arabic value'))->rows(4)->extraInputAttributes(['dir' => 'rtl']),
+                        TextInput::make('commerce.delivery_fee')->label(__('Delivery fee'))->numeric()->minValue(0)->required()->suffix(__('minor units')),
+                        TextInput::make('commerce.tax_percentage')->label(__('Tax percentage'))->numeric()->minValue(0)->maxValue(100)->required()->suffix('%'),
+                    ]),
+                Section::make(__('Social links'))
+                    ->columns(2)
+                    ->schema([
+                        TextInput::make('social.facebook_url')->label(__('Facebook URL'))->url()->maxLength(2048),
+                        TextInput::make('social.instagram_url')->label(__('Instagram URL'))->url()->maxLength(2048),
                     ]),
             ]);
     }

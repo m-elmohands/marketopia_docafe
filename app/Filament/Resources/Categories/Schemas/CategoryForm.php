@@ -25,10 +25,10 @@ class CategoryForm
                     ->image()
                     ->imageEditor()
                     ->columnSpanFull(),
-                Tabs::make('Translations')
+                Tabs::make('Translations / الترجمات')
                     ->tabs([
-                        Tab::make(__('English content'))->schema(self::translationFields('en')),
-                        Tab::make(__('Arabic content'))->schema(self::translationFields('ar')),
+                        Tab::make('English')->schema(self::translationFields('en')),
+                        Tab::make('العربية')->schema(self::translationFields('ar')),
                     ])
                     ->columnSpanFull(),
                 Section::make(__('Organization and publishing'))
@@ -49,11 +49,26 @@ class CategoryForm
     /** @return array<int, TextInput|Textarea> */
     private static function translationFields(string $locale): array
     {
+        $labels = $locale === 'ar'
+            ? [
+                'name' => 'الاسم',
+                'description' => 'الوصف',
+                'meta_title' => 'عنوان تحسين محركات البحث',
+                'meta_description' => 'وصف تحسين محركات البحث',
+            ]
+            : [
+                'name' => 'Name',
+                'description' => 'Description',
+                'meta_title' => 'SEO title',
+                'meta_description' => 'SEO description',
+            ];
+        $direction = ['dir' => $locale === 'ar' ? 'rtl' : 'ltr'];
+
         return [
-            TextInput::make("{$locale}.name")->label(__('Name'))->required()->maxLength(255),
-            Textarea::make("{$locale}.description")->label(__('Description'))->rows(5)->columnSpanFull(),
-            TextInput::make("{$locale}.meta_title")->label(__('SEO title'))->maxLength(255),
-            Textarea::make("{$locale}.meta_description")->label(__('SEO description'))->rows(3),
+            TextInput::make("{$locale}.name")->label($labels['name'])->required()->maxLength(255)->extraInputAttributes($direction),
+            Textarea::make("{$locale}.description")->label($labels['description'])->rows(5)->columnSpanFull()->extraInputAttributes($direction),
+            TextInput::make("{$locale}.meta_title")->label($labels['meta_title'])->maxLength(255)->extraInputAttributes($direction),
+            Textarea::make("{$locale}.meta_description")->label($labels['meta_description'])->rows(3)->extraInputAttributes($direction),
         ];
     }
 }

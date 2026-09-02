@@ -4,6 +4,7 @@ namespace App\Policies\Concerns;
 
 use App\Models\User;
 use App\Support\Authorization\PermissionRegistry;
+use Illuminate\Auth\Access\Response;
 use Illuminate\Database\Eloquent\Model;
 
 trait AuthorizesResourcePermissions
@@ -30,7 +31,7 @@ trait AuthorizesResourcePermissions
         return $this->allowed($user, 'update');
     }
 
-    public function delete(User $user, Model $model): bool
+    public function delete(User $user, Model $model): bool|Response
     {
         return $this->allowed($user, 'delete');
     }
@@ -50,7 +51,7 @@ trait AuthorizesResourcePermissions
         return $this->allowed($user, 'restore');
     }
 
-    public function forceDelete(User $user, Model $model): bool
+    public function forceDelete(User $user, Model $model): bool|Response
     {
         return $this->allowed($user, 'force_delete');
     }

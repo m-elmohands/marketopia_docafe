@@ -8,7 +8,9 @@ use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
 use Astrotomic\Translatable\Translatable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Validation\ValidationException;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
@@ -54,8 +56,29 @@ class Product extends Model implements HasMedia, TranslatableContract
         ];
     }
 
+    protected static function booted(): void
+    {
+        static::deleting(function (self $product): void {
+            if (! $product->canBeDeleted()) {
+                throw ValidationException::withMessages([
+                    'product' => __('A product included in an order cannot be deleted.'),
+                ]);
+            }
+        });
+    }
+
     public function categories(): BelongsToMany
     {
         return $this->belongsToMany(Category::class)->withTimestamps();
+    }
+
+    public function orderItems(): HasMany
+    {
+        return $this->hasMany(OrderItem::class);
+    }
+
+    public function canBeDeleted(): bool
+    {
+        return ! $this->orderItems()->exists();
     }
 }

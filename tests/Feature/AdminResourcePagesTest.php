@@ -8,8 +8,6 @@ use App\Filament\Resources\Categories\CategoryResource;
 use App\Filament\Resources\Categories\Pages\ListCategories;
 use App\Filament\Resources\Products\Pages\ListProducts;
 use App\Filament\Resources\Products\ProductResource;
-use App\Filament\Resources\Settings\Pages\ListSettings;
-use App\Filament\Resources\Settings\SettingResource;
 use App\Filament\Resources\Users\Pages\ListUsers;
 use App\Filament\Resources\Users\UserResource;
 use App\Filament\Widgets\CommerceOverview;
@@ -62,7 +60,6 @@ class AdminResourcePagesTest extends TestCase
             ArticleResource::class,
             CategoryResource::class,
             ProductResource::class,
-            SettingResource::class,
             UserResource::class,
         ] as $resource) {
             $this->assertFalse($resource::hasPage('create'));
@@ -73,7 +70,6 @@ class AdminResourcePagesTest extends TestCase
             ListArticles::class,
             ListCategories::class,
             ListProducts::class,
-            ListSettings::class,
             ListUsers::class,
         ] as $page) {
             Livewire::test($page)
