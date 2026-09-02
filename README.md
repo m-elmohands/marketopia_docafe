@@ -1,5 +1,14 @@
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
+## Do Cafe Ecommerce API
+
+The `/api/v1` API provides Sanctum customer authentication, localized catalog and articles, persistent carts, stock-safe checkout, orders, and Paymob Unified Checkout. Send `Accept-Language: en` or `ar`, use integer minor units for money, and send a stable UUID `idempotency_key` for each checkout attempt.
+
+Configure the `PAYMOB_*` variables from `.env.example` and point the Paymob transaction callback to `PAYMOB_NOTIFICATION_URL`. The API contract is documented in [`docs/api/openapi.yaml`](docs/api/openapi.yaml).
+
+Interactive API documentation is available at `/api/documentation`, and the raw specification is served from `/api/openapi.yaml`.
+The import-ready Postman collection URL is `/api/postman-collection`; Postman can import this URL directly.
+
 <p align="center">
 <a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>

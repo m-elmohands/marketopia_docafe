@@ -1,0 +1,149 @@
+openapi: 3.1.0
+info:
+  title: Do Cafe Ecommerce API
+  version: 1.0.0
+  description: Bilingual storefront and Paymob checkout API. Money values are integer minor units.
+servers:
+  - url: /api/v1
+paths:
+  /auth/register:
+    post: {$ref: '#/components/pathItems/register'}
+  /auth/login:
+    post: {$ref: '#/components/pathItems/login'}
+  /auth/user:
+    get: {$ref: '#/components/pathItems/authenticated'}
+  /auth/logout:
+    post: {$ref: '#/components/pathItems/authenticated'}
+  /products:
+    get:
+      summary: Paginated active products
+      parameters: [{$ref: '#/components/parameters/locale'}, {$ref: '#/components/parameters/page'}, {$ref: '#/components/parameters/perPage'}]
+      responses: {'200': {$ref: '#/components/responses/success'}}
+  /products/{slug}:
+    get: {$ref: '#/components/pathItems/bySlug'}
+  /categories:
+    get: {$ref: '#/components/pathItems/publicList'}
+  /articles:
+    get: {$ref: '#/components/pathItems/publicList'}
+  /articles/{slug}:
+    get: {$ref: '#/components/pathItems/bySlug'}
+  /settings:
+    get: {$ref: '#/components/pathItems/publicList'}
+  /cart:
+    get: {$ref: '#/components/pathItems/authenticated'}
+  /cart/items:
+    post:
+      security: [{bearerAuth: []}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [product_id, quantity]
+              properties:
+                product_id: {type: integer}
+                quantity: {type: integer, minimum: 1, maximum: 100}
+                options: {type: object}
+      responses: {'201': {$ref: '#/components/responses/success'}, '422': {$ref: '#/components/responses/validation'}}
+  /cart/items/{cartItem}:
+    patch: {$ref: '#/components/pathItems/authenticated'}
+    delete: {$ref: '#/components/pathItems/authenticated'}
+  /checkout:
+    post:
+      summary: Create an idempotent order and Paymob Unified Checkout URL
+      security: [{bearerAuth: []}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/checkout'}
+      responses: {'201': {$ref: '#/components/responses/success'}, '422': {$ref: '#/components/responses/validation'}}
+  /orders:
+    get: {$ref: '#/components/pathItems/authenticated'}
+  /orders/{order}:
+    get: {$ref: '#/components/pathItems/authenticated'}
+  /payments/paymob/webhook:
+    post:
+      summary: HMAC-verified Paymob transaction callback
+      parameters:
+        - {name: hmac, in: query, required: true, schema: {type: string}}
+      requestBody:
+        required: true
+        content: {application/json: {schema: {type: object}}}
+      responses: {'200': {$ref: '#/components/responses/success'}, '401': {$ref: '#/components/responses/unauthorized'}}
+components:
+  securitySchemes:
+    bearerAuth: {type: http, scheme: bearer, bearerFormat: Sanctum}
+  parameters:
+    locale: {name: Accept-Language, in: header, schema: {type: string, enum: [en, ar]}}
+    page: {name: page, in: query, schema: {type: integer, minimum: 1}}
+    perPage: {name: per_page, in: query, schema: {type: integer, minimum: 1, maximum: 50}}
+  pathItems:
+    publicList:
+      parameters: [{$ref: '#/components/parameters/locale'}]
+      responses: {'200': {$ref: '#/components/responses/success'}}
+    bySlug:
+      parameters:
+        - {name: slug, in: path, required: true, schema: {type: string}}
+        - {$ref: '#/components/parameters/locale'}
+      responses: {'200': {$ref: '#/components/responses/success'}, '404': {description: Not found}}
+    authenticated:
+      security: [{bearerAuth: []}]
+      responses: {'200': {$ref: '#/components/responses/success'}, '401': {$ref: '#/components/responses/unauthorized'}}
+    register:
+      requestBody:
+        required: true
+        content: {application/json: {schema: {$ref: '#/components/schemas/register'}}}
+      responses: {'201': {$ref: '#/components/responses/success'}, '422': {$ref: '#/components/responses/validation'}}
+    login:
+      requestBody:
+        required: true
+        content: {application/json: {schema: {$ref: '#/components/schemas/login'}}}
+      responses: {'200': {$ref: '#/components/responses/success'}, '422': {$ref: '#/components/responses/validation'}}
+  schemas:
+    register:
+      type: object
+      required: [name, email, password, password_confirmation, device_name]
+      properties:
+        name: {type: string}
+        email: {type: string, format: email}
+        password: {type: string, format: password, minLength: 8}
+        password_confirmation: {type: string}
+        device_name: {type: string}
+    login:
+      type: object
+      required: [email, password, device_name]
+      properties:
+        email: {type: string, format: email}
+        password: {type: string, format: password}
+        device_name: {type: string}
+    checkout:
+      type: object
+      required: [idempotency_key, customer_name, customer_email, customer_phone, shipping_address, payment_method]
+      properties:
+        idempotency_key: {type: string, format: uuid}
+        customer_name: {type: string}
+        customer_email: {type: string, format: email}
+        customer_phone: {type: string}
+        shipping_address:
+          type: object
+          required: [building, street, city, country]
+          properties:
+            building: {type: string}
+            street: {type: string}
+            city: {type: string}
+            country: {type: string, minLength: 2, maxLength: 2}
+        payment_method: {type: string, enum: [paymob]}
+        customer_notes: {type: string, nullable: true}
+    envelope:
+      type: object
+      required: [data, message, errors]
+      properties:
+        data: {}
+        message: {type: string}
+        errors: {type: object, nullable: true}
+  responses:
+    success: {description: Success, content: {application/json: {schema: {$ref: '#/components/schemas/envelope'}}}}
+    validation: {description: Validation error, content: {application/json: {schema: {$ref: '#/components/schemas/envelope'}}}}
+    unauthorized: {description: Unauthenticated or invalid signature, content: {application/json: {schema: {$ref: '#/components/schemas/envelope'}}}}

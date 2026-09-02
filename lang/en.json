@@ -101,5 +101,19 @@
     "Stages of Coffee Formation": "Stages of Coffee Formation",
     "Add and arrange the preparation stages shown for this product.": "Add and arrange the preparation stages shown for this product.",
     "Add stage": "Add stage",
-    "Stage image": "Stage image"
+    "Stage image": "Stage image",
+    "The provided credentials are incorrect.": "The provided credentials are incorrect.",
+    "Authenticated successfully.": "Authenticated successfully.",
+    "Logged out successfully.": "Logged out successfully.",
+    "Your cart is empty.": "Your cart is empty.",
+    "A cart item is no longer available in the requested quantity.": "A cart item is no longer available in the requested quantity.",
+    "The requested quantity is not available.": "The requested quantity is not available.",
+    "Checkout created successfully.": "Checkout created successfully.",
+    "Invalid payment signature.": "Invalid payment signature.",
+    "Webhook accepted.": "Webhook accepted.",
+    "The given data was invalid.": "The given data was invalid.",
+    "Unauthenticated.": "Unauthenticated.",
+    "Forbidden.": "Forbidden.",
+    "Resource not found.": "Resource not found.",
+    "Request failed.": "Request failed."
 }

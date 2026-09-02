@@ -1,0 +1,106 @@
+{
+    "info": {
+        "_postman_id": "8d85e45c-b8ae-4fa5-926d-6e7fc16ff8d8",
+        "name": "Do Cafe Ecommerce API",
+        "description": "Do Cafe bilingual ecommerce API. Run Register or Login first; their test scripts automatically save the Sanctum bearer token. Monetary values use integer minor units.",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "auth": {
+        "type": "bearer",
+        "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]
+    },
+    "variable": [
+        {"key": "base_url", "value": "http://localhost:8000/api/v1", "type": "string"},
+        {"key": "token", "value": "", "type": "string"},
+        {"key": "locale", "value": "en", "type": "string"},
+        {"key": "email", "value": "customer@example.com", "type": "string"},
+        {"key": "password", "value": "Password123", "type": "string"},
+        {"key": "product_slug", "value": "espresso", "type": "string"},
+        {"key": "article_slug", "value": "how-espresso-is-made", "type": "string"},
+        {"key": "product_id", "value": "1", "type": "string"},
+        {"key": "cart_item_id", "value": "1", "type": "string"},
+        {"key": "order_id", "value": "1", "type": "string"},
+        {"key": "paymob_hmac", "value": "", "type": "string"}
+    ],
+    "item": [
+        {
+            "name": "Authentication",
+            "item": [
+                {
+                    "name": "Register",
+                    "event": [{"listen": "test", "script": {"type": "text/javascript", "exec": ["const body = pm.response.json();", "if (body.data && body.data.token) pm.collectionVariables.set('token', body.data.token);"]}}],
+                    "request": {
+                        "auth": {"type": "noauth"},
+                        "method": "POST",
+                        "header": [{"key": "Accept", "value": "application/json"}, {"key": "Accept-Language", "value": "{{locale}}"}],
+                        "body": {"mode": "raw", "raw": "{\n  \"name\": \"Coffee Customer\",\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\",\n  \"password_confirmation\": \"{{password}}\",\n  \"device_name\": \"Postman\"\n}", "options": {"raw": {"language": "json"}}},
+                        "url": "{{base_url}}/auth/register"
+                    }
+                },
+                {
+                    "name": "Login",
+                    "event": [{"listen": "test", "script": {"type": "text/javascript", "exec": ["const body = pm.response.json();", "if (body.data && body.data.token) pm.collectionVariables.set('token', body.data.token);"]}}],
+                    "request": {"auth": {"type": "noauth"}, "method": "POST", "header": [{"key": "Accept", "value": "application/json"}, {"key": "Accept-Language", "value": "{{locale}}"}], "body": {"mode": "raw", "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\",\n  \"device_name\": \"Postman\"\n}", "options": {"raw": {"language": "json"}}}, "url": "{{base_url}}/auth/login"}
+                },
+                {"name": "Current User", "request": {"method": "GET", "header": [{"key": "Accept", "value": "application/json"}], "url": "{{base_url}}/auth/user"}},
+                {"name": "Logout", "request": {"method": "POST", "header": [{"key": "Accept", "value": "application/json"}], "url": "{{base_url}}/auth/logout"}}
+            ]
+        },
+        {
+            "name": "Catalog",
+            "item": [
+                {"name": "List Products", "request": {"auth": {"type": "noauth"}, "method": "GET", "header": [{"key": "Accept-Language", "value": "{{locale}}"}], "url": "{{base_url}}/products?per_page=15&sort=-price"}},
+                {"name": "Show Product", "request": {"auth": {"type": "noauth"}, "method": "GET", "header": [{"key": "Accept-Language", "value": "{{locale}}"}], "url": "{{base_url}}/products/{{product_slug}}"}},
+                {"name": "List Categories", "request": {"auth": {"type": "noauth"}, "method": "GET", "header": [{"key": "Accept-Language", "value": "{{locale}}"}], "url": "{{base_url}}/categories"}}
+            ]
+        },
+        {
+            "name": "Content",
+            "item": [
+                {"name": "List Articles", "request": {"auth": {"type": "noauth"}, "method": "GET", "header": [{"key": "Accept-Language", "value": "{{locale}}"}], "url": "{{base_url}}/articles"}},
+                {"name": "Show Article", "request": {"auth": {"type": "noauth"}, "method": "GET", "header": [{"key": "Accept-Language", "value": "{{locale}}"}], "url": "{{base_url}}/articles/{{article_slug}}"}},
+                {"name": "Public Settings", "request": {"auth": {"type": "noauth"}, "method": "GET", "header": [{"key": "Accept-Language", "value": "{{locale}}"}], "url": "{{base_url}}/settings"}}
+            ]
+        },
+        {
+            "name": "Cart",
+            "item": [
+                {"name": "Show Cart", "request": {"method": "GET", "header": [{"key": "Accept", "value": "application/json"}], "url": "{{base_url}}/cart"}},
+                {"name": "Add Item", "request": {"method": "POST", "header": [{"key": "Accept", "value": "application/json"}], "body": {"mode": "raw", "raw": "{\n  \"product_id\": {{product_id}},\n  \"quantity\": 2\n}", "options": {"raw": {"language": "json"}}}, "url": "{{base_url}}/cart/items"}},
+                {"name": "Update Item", "request": {"method": "PATCH", "header": [{"key": "Accept", "value": "application/json"}], "body": {"mode": "raw", "raw": "{\n  \"quantity\": 1\n}", "options": {"raw": {"language": "json"}}}, "url": "{{base_url}}/cart/items/{{cart_item_id}}"}},
+                {"name": "Remove Item", "request": {"method": "DELETE", "header": [{"key": "Accept", "value": "application/json"}], "url": "{{base_url}}/cart/items/{{cart_item_id}}"}}
+            ]
+        },
+        {
+            "name": "Checkout and Orders",
+            "item": [
+                {
+                    "name": "Create Checkout",
+                    "event": [
+                        {"listen": "prerequest", "script": {"type": "text/javascript", "exec": ["pm.variables.set('idempotency_key', pm.variables.replaceIn('{{$guid}}'));"]}},
+                        {"listen": "test", "script": {"type": "text/javascript", "exec": ["const body = pm.response.json();", "if (body.data && body.data.order) pm.collectionVariables.set('order_id', body.data.order.id);"]}}
+                    ],
+                    "request": {"method": "POST", "header": [{"key": "Accept", "value": "application/json"}, {"key": "Accept-Language", "value": "{{locale}}"}], "body": {"mode": "raw", "raw": "{\n  \"idempotency_key\": \"{{idempotency_key}}\",\n  \"customer_name\": \"Coffee Customer\",\n  \"customer_email\": \"{{email}}\",\n  \"customer_phone\": \"+201001234567\",\n  \"shipping_address\": {\n    \"building\": \"10\",\n    \"street\": \"Tahrir Street\",\n    \"city\": \"Cairo\",\n    \"country\": \"EG\"\n  },\n  \"payment_method\": \"paymob\"\n}", "options": {"raw": {"language": "json"}}}, "url": "{{base_url}}/checkout"}
+                },
+                {"name": "List Orders", "request": {"method": "GET", "header": [{"key": "Accept", "value": "application/json"}], "url": "{{base_url}}/orders"}},
+                {"name": "Show Order", "request": {"method": "GET", "header": [{"key": "Accept", "value": "application/json"}], "url": "{{base_url}}/orders/{{order_id}}"}}
+            ]
+        },
+        {
+            "name": "Payments",
+            "item": [
+                {
+                    "name": "Paymob Webhook Example",
+                    "request": {
+                        "auth": {"type": "noauth"},
+                        "method": "POST",
+                        "header": [{"key": "Accept", "value": "application/json"}],
+                        "body": {"mode": "raw", "raw": "{\n  \"type\": \"TRANSACTION\",\n  \"obj\": {\n    \"id\": 98765,\n    \"amount_cents\": 11500,\n    \"currency\": \"EGP\",\n    \"success\": true,\n    \"pending\": false\n  }\n}", "options": {"raw": {"language": "json"}}},
+                        "url": "{{base_url}}/payments/paymob/webhook?hmac={{paymob_hmac}}",
+                        "description": "Provider callback example. A valid HMAC must be generated by Paymob; never expose PAYMOB_HMAC_SECRET to Postman or frontend clients."
+                    }
+                }
+            ]
+        }
+    ]
+}

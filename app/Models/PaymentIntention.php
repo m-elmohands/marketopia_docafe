@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\Currency;
+use App\Enums\PaymentProcessingStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -37,6 +39,8 @@ class PaymentIntention extends Model
     protected function casts(): array
     {
         return [
+            'status' => PaymentProcessingStatus::class,
+            'currency' => Currency::class,
             'payment_methods' => 'array',
             'is_live' => 'boolean',
             'provider_data' => 'array',

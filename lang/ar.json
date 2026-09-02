@@ -101,5 +101,19 @@
     "Stages of Coffee Formation": "مراحل تكوين القهوة",
     "Add and arrange the preparation stages shown for this product.": "أضف ورتب مراحل التحضير المعروضة لهذا المنتج.",
     "Add stage": "إضافة مرحلة",
-    "Stage image": "صورة المرحلة"
+    "Stage image": "صورة المرحلة",
+    "The provided credentials are incorrect.": "بيانات تسجيل الدخول غير صحيحة.",
+    "Authenticated successfully.": "تم تسجيل الدخول بنجاح.",
+    "Logged out successfully.": "تم تسجيل الخروج بنجاح.",
+    "Your cart is empty.": "سلة التسوق فارغة.",
+    "A cart item is no longer available in the requested quantity.": "أحد منتجات السلة لم يعد متاحًا بالكمية المطلوبة.",
+    "The requested quantity is not available.": "الكمية المطلوبة غير متاحة.",
+    "Checkout created successfully.": "تم إنشاء عملية الدفع بنجاح.",
+    "Invalid payment signature.": "توقيع عملية الدفع غير صالح.",
+    "Webhook accepted.": "تم قبول إشعار الدفع.",
+    "The given data was invalid.": "البيانات المدخلة غير صالحة.",
+    "Unauthenticated.": "يجب تسجيل الدخول.",
+    "Forbidden.": "غير مصرح بتنفيذ هذا الإجراء.",
+    "Resource not found.": "المورد المطلوب غير موجود.",
+    "Request failed.": "تعذر تنفيذ الطلب."
 }

@@ -6,6 +6,7 @@ use App\Enums\SettingType;
 use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
 use Astrotomic\Translatable\Translatable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 
 class Setting extends Model implements TranslatableContract
 {
@@ -28,5 +29,13 @@ class Setting extends Model implements TranslatableContract
             'type' => SettingType::class,
             'is_public' => 'boolean',
         ];
+    }
+
+    protected static function booted(): void
+    {
+        $clearApiCache = fn () => collect(['en', 'ar'])->each(fn (string $locale) => Cache::forget("api.settings.{$locale}"));
+
+        static::saved($clearApiCache);
+        static::deleted($clearApiCache);
     }
 }
