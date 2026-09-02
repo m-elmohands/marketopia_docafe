@@ -77,6 +77,11 @@ class Product extends Model implements HasMedia, TranslatableContract
         return $this->hasMany(OrderItem::class);
     }
 
+    public function stages(): HasMany
+    {
+        return $this->hasMany(ProductStage::class)->orderBy('sort_order');
+    }
+
     public function canBeDeleted(): bool
     {
         return ! $this->orderItems()->exists();

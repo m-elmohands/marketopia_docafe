@@ -7,6 +7,7 @@ use App\Enums\Currency;
 use App\Models\Category;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\KeyValue;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\Textarea;
@@ -16,6 +17,7 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Schema;
+use Illuminate\Database\Eloquent\Builder;
 
 class ProductForm
 {
@@ -63,6 +65,54 @@ class ProductForm
                         TextInput::make('low_stock_threshold')->numeric()->minValue(0),
                         DateTimePicker::make('published_at'),
                         KeyValue::make('metadata')->columnSpanFull(),
+                    ]),
+                Section::make(__('Stages of Coffee Formation'))
+                    ->description(__('Add and arrange the preparation stages shown for this product.'))
+                    ->schema([
+                        Repeater::make('stages')
+                            ->relationship(
+                                'stages',
+                                modifyQueryUsing: fn (Builder $query): Builder => $query->with('translations'),
+                            )
+                            ->orderColumn('sort_order')
+                            ->reorderableWithButtons()
+                            ->collapsible()
+                            ->itemNumbers()
+                            ->addActionLabel(__('Add stage'))
+                            ->schema([
+                                SpatieMediaLibraryFileUpload::make('image')
+                                    ->collection('stage-image')
+                                    ->label(__('Stage image'))
+                                    ->image()
+                                    ->imageEditor()
+                                    ->columnSpanFull(),
+                                Tabs::make('Translations / الترجمات')
+                                    ->tabs([
+                                        Tab::make('English')->schema([
+                                            TextInput::make('en.title')
+                                                ->label('Title')
+                                                ->required()
+                                                ->maxLength(255)
+                                                ->extraInputAttributes(['dir' => 'ltr']),
+                                            Textarea::make('en.description')
+                                                ->label('Description')
+                                                ->rows(4)
+                                                ->extraInputAttributes(['dir' => 'ltr']),
+                                        ]),
+                                        Tab::make('العربية')->schema([
+                                            TextInput::make('ar.title')
+                                                ->label('العنوان')
+                                                ->required()
+                                                ->maxLength(255)
+                                                ->extraInputAttributes(['dir' => 'rtl']),
+                                            Textarea::make('ar.description')
+                                                ->label('الوصف')
+                                                ->rows(4)
+                                                ->extraInputAttributes(['dir' => 'rtl']),
+                                        ]),
+                                    ]),
+                            ])
+                            ->columnSpanFull(),
                     ]),
             ]);
     }
