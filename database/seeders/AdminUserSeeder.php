@@ -34,7 +34,7 @@ class AdminUserSeeder extends Seeder
             );
         }
 
-        if (filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
+        if (! filter_var($email, FILTER_VALIDATE_EMAIL)) {
             throw new LogicException('ADMIN_USER_EMAIL must be a valid email address.');
         }
 

@@ -10,6 +10,7 @@ final class PermissionRegistry
     public const RESOURCES = [
         'users',
         'products',
+        'categories',
         'articles',
         'settings',
         'orders',

@@ -31,6 +31,8 @@ class AdminAuthorizationTest extends TestCase
         $this->actingAs($user)
             ->get('/admin')
             ->assertForbidden();
+
+        $this->get('/admin/profile')->assertForbidden();
     }
 
     public function test_panel_and_resource_permissions_are_independent(): void

@@ -5,11 +5,14 @@ namespace App\Models;
 use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
 use Astrotomic\Translatable\Translatable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class Product extends Model implements TranslatableContract
+class Product extends Model implements HasMedia, TranslatableContract
 {
-    use SoftDeletes, Translatable;
+    use InteractsWithMedia, SoftDeletes, Translatable;
 
     /** @var list<string> */
     public array $translatedAttributes = [
@@ -45,5 +48,10 @@ class Product extends Model implements TranslatableContract
             'metadata' => 'array',
             'published_at' => 'datetime',
         ];
+    }
+
+    public function categories(): BelongsToMany
+    {
+        return $this->belongsToMany(Category::class)->withTimestamps();
     }
 }

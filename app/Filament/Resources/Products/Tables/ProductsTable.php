@@ -1,0 +1,55 @@
+<?php
+
+namespace App\Filament\Resources\Products\Tables;
+
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Actions\RestoreBulkAction;
+use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ToggleColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Table;
+
+class ProductsTable
+{
+    public static function configure(Table $table): Table
+    {
+        return $table
+            ->columns([
+                SpatieMediaLibraryImageColumn::make('image')->collection('product-images')->circular(),
+                TextColumn::make('name')->label('Product')->searchable(['sku'])->wrap(),
+                TextColumn::make('sku')->searchable()->copyable(),
+                TextColumn::make('price')->money(fn ($record): string => $record->currency, divideBy: 100)->sortable(),
+                TextColumn::make('stock_quantity')->label('Stock')->numeric()->sortable(),
+                TextColumn::make('status')->badge()->color(fn (string $state): string => match ($state) {
+                    'active' => 'success',
+                    'archived' => 'gray',
+                    default => 'warning',
+                }),
+                ToggleColumn::make('is_featured')->label('Featured'),
+                TextColumn::make('updated_at')->dateTime()->sortable()->toggleable(isToggledHiddenByDefault: true),
+            ])
+            ->filters([
+                SelectFilter::make('status')->options([
+                    'draft' => 'Draft',
+                    'active' => 'Active',
+                    'archived' => 'Archived',
+                ]),
+                TrashedFilter::make(),
+            ])
+            ->recordActions([
+                EditAction::make(),
+            ])
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                    ForceDeleteBulkAction::make(),
+                    RestoreBulkAction::make(),
+                ]),
+            ]);
+    }
+}

@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\Article;
+use App\Models\Category;
 use App\Models\Order;
 use App\Models\PaymentIntention;
 use App\Models\PaymentRefund;
@@ -12,6 +13,7 @@ use App\Models\Product;
 use App\Models\Setting;
 use App\Models\User;
 use App\Policies\ArticlePolicy;
+use App\Policies\CategoryPolicy;
 use App\Policies\OrderPolicy;
 use App\Policies\PaymentIntentionPolicy;
 use App\Policies\PaymentRefundPolicy;
@@ -40,6 +42,7 @@ class AppServiceProvider extends ServiceProvider
     {
         Gate::policy(User::class, UserPolicy::class);
         Gate::policy(Product::class, ProductPolicy::class);
+        Gate::policy(Category::class, CategoryPolicy::class);
         Gate::policy(Article::class, ArticlePolicy::class);
         Gate::policy(Setting::class, SettingPolicy::class);
         Gate::policy(Order::class, OrderPolicy::class);
