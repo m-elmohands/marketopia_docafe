@@ -1,8 +1,8 @@
 openapi: 3.1.0
 info:
   title: Do Cafe Ecommerce API
-  version: 1.0.0
-  description: Bilingual storefront and Paymob checkout API. Money values are integer minor units.
+  version: 1.1.0
+  description: Bilingual coffee storefront API with customer profiles, saved addresses, wishlists, carts, orders, Paymob, and cash-on-delivery checkout. Money values are integer minor units.
 servers:
   - url: /api/v1
 paths:
@@ -11,9 +11,71 @@ paths:
   /auth/login:
     post: {$ref: '#/components/pathItems/login'}
   /auth/user:
-    get: {$ref: '#/components/pathItems/authenticated'}
+    get:
+      summary: Get the authenticated customer profile
+      security: [{bearerAuth: []}]
+      responses: {'200': {$ref: '#/components/responses/user'}, '401': {$ref: '#/components/responses/unauthorized'}}
   /auth/logout:
     post: {$ref: '#/components/pathItems/authenticated'}
+  /profile:
+    patch:
+      operationId: updateCustomerProfile
+      tags: [Customer Account]
+      summary: Update the authenticated customer's profile or password
+      security: [{bearerAuth: []}]
+      requestBody:
+        required: true
+        content: {application/json: {schema: {$ref: '#/components/schemas/profileUpdate'}}}
+      responses: {'200': {$ref: '#/components/responses/user'}, '401': {$ref: '#/components/responses/unauthorized'}, '422': {$ref: '#/components/responses/validation'}}
+  /addresses:
+    get:
+      operationId: listCustomerAddresses
+      tags: [Customer Addresses]
+      summary: List the authenticated customer's saved addresses
+      security: [{bearerAuth: []}]
+      responses: {'200': {$ref: '#/components/responses/addressList'}, '401': {$ref: '#/components/responses/unauthorized'}}
+    post:
+      operationId: storeCustomerAddress
+      tags: [Customer Addresses]
+      summary: Save a customer address
+      security: [{bearerAuth: []}]
+      requestBody:
+        required: true
+        content: {application/json: {schema: {$ref: '#/components/schemas/addressInput'}}}
+      responses: {'201': {$ref: '#/components/responses/address'}, '401': {$ref: '#/components/responses/unauthorized'}, '422': {$ref: '#/components/responses/validation'}}
+  /addresses/{address}:
+    parameters:
+      - {name: address, in: path, required: true, schema: {type: integer}}
+    get:
+      operationId: showCustomerAddress
+      tags: [Customer Addresses]
+      summary: View an owned saved address
+      security: [{bearerAuth: []}]
+      responses: {'200': {$ref: '#/components/responses/address'}, '401': {$ref: '#/components/responses/unauthorized'}, '403': {$ref: '#/components/responses/forbidden'}, '404': {description: Address not found}}
+    put:
+      operationId: replaceCustomerAddress
+      tags: [Customer Addresses]
+      summary: Replace an owned saved address
+      security: [{bearerAuth: []}]
+      requestBody:
+        required: true
+        content: {application/json: {schema: {$ref: '#/components/schemas/addressInput'}}}
+      responses: {'200': {$ref: '#/components/responses/address'}, '401': {$ref: '#/components/responses/unauthorized'}, '403': {$ref: '#/components/responses/forbidden'}, '422': {$ref: '#/components/responses/validation'}}
+    patch:
+      operationId: updateCustomerAddress
+      tags: [Customer Addresses]
+      summary: Update an owned saved address
+      security: [{bearerAuth: []}]
+      requestBody:
+        required: true
+        content: {application/json: {schema: {$ref: '#/components/schemas/addressUpdate'}}}
+      responses: {'200': {$ref: '#/components/responses/address'}, '401': {$ref: '#/components/responses/unauthorized'}, '403': {$ref: '#/components/responses/forbidden'}, '422': {$ref: '#/components/responses/validation'}}
+    delete:
+      operationId: deleteCustomerAddress
+      tags: [Customer Addresses]
+      summary: Soft-delete an owned address and promote another default when needed
+      security: [{bearerAuth: []}]
+      responses: {'200': {$ref: '#/components/responses/success'}, '401': {$ref: '#/components/responses/unauthorized'}, '403': {$ref: '#/components/responses/forbidden'}, '404': {description: Address not found}}
   /products:
     get:
       summary: Paginated active products
@@ -49,16 +111,57 @@ paths:
   /cart/items/{cartItem}:
     patch: {$ref: '#/components/pathItems/authenticated'}
     delete: {$ref: '#/components/pathItems/authenticated'}
+  /wishlist:
+    get:
+      operationId: listWishlist
+      tags: [Wishlist]
+      summary: List the authenticated customer's available wishlist products
+      security: [{bearerAuth: []}]
+      parameters:
+        - {$ref: '#/components/parameters/locale'}
+        - {$ref: '#/components/parameters/page'}
+        - {$ref: '#/components/parameters/perPage'}
+        - {name: search, in: query, schema: {type: string, maxLength: 100}}
+        - {name: sort, in: query, schema: {type: string, enum: [newest, oldest], default: newest}}
+      responses: {'200': {$ref: '#/components/responses/success'}, '401': {$ref: '#/components/responses/unauthorized'}}
+  /wishlist/items:
+    post:
+      operationId: addWishlistProduct
+      tags: [Wishlist]
+      summary: Add an available product to the authenticated customer's wishlist
+      security: [{bearerAuth: []}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [product_id]
+              properties:
+                product_id: {type: integer}
+      responses: {'200': {$ref: '#/components/responses/success'}, '201': {$ref: '#/components/responses/success'}, '422': {$ref: '#/components/responses/validation'}}
+  /wishlist/items/{product}:
+    delete:
+      operationId: removeWishlistProduct
+      tags: [Wishlist]
+      summary: Remove an owned wishlist item by product ID
+      security: [{bearerAuth: []}]
+      parameters:
+        - {name: product, in: path, required: true, schema: {type: integer}}
+      responses: {'200': {$ref: '#/components/responses/success'}, '404': {description: Product or owned wishlist item not found}}
   /checkout:
     post:
-      summary: Create an order with a backend-generated idempotency key and Paymob Unified Checkout URL
+      operationId: createCheckout
+      tags: [Checkout]
+      summary: Create a Paymob or cash-on-delivery order with a backend-generated idempotency key
+      description: Paymob returns a redirect URL. Cash on delivery returns a null checkout_url, creates no Paymob intention, and remains payment-pending until collection.
       security: [{bearerAuth: []}]
       requestBody:
         required: true
         content:
           application/json:
             schema: {$ref: '#/components/schemas/checkout'}
-      responses: {'201': {$ref: '#/components/responses/success'}, '422': {$ref: '#/components/responses/validation'}}
+      responses: {'201': {$ref: '#/components/responses/checkout'}, '401': {$ref: '#/components/responses/unauthorized'}, '422': {$ref: '#/components/responses/validation'}}
   /orders:
     get: {$ref: '#/components/pathItems/authenticated'}
   /orders/{order}:
@@ -118,23 +221,117 @@ components:
         email: {type: string, format: email}
         password: {type: string, format: password}
         device_name: {type: string}
+    profileUpdate:
+      type: object
+      properties:
+        name: {type: string, maxLength: 255}
+        email: {type: string, format: email}
+        phone: {type: string, nullable: true}
+        current_password: {type: string, format: password, description: Required when changing password}
+        password: {type: string, format: password, minLength: 8}
+        password_confirmation: {type: string, format: password}
+    user:
+      type: object
+      required: [id, name, email]
+      properties:
+        id: {type: integer}
+        name: {type: string}
+        email: {type: string, format: email}
+        phone: {type: [string, 'null']}
+    addressInput:
+      type: object
+      required: [label, recipient_name, phone, building, street, city, country]
+      properties:
+        label: {type: string, example: Home}
+        recipient_name: {type: string}
+        phone: {type: string}
+        apartment: {type: string, nullable: true}
+        building: {type: string}
+        street: {type: string}
+        city: {type: string}
+        state: {type: string, nullable: true}
+        country: {type: string, minLength: 2, maxLength: 2, example: EG}
+        postal_code: {type: string, nullable: true}
+        is_default: {type: boolean, default: false}
+    addressUpdate:
+      type: object
+      description: Include only the address fields that should change.
+      properties:
+        label: {type: string, maxLength: 100}
+        recipient_name: {type: string, maxLength: 255}
+        phone: {type: string, pattern: '^\+?[0-9]{8,15}$'}
+        apartment: {type: [string, 'null'], maxLength: 100}
+        building: {type: string, maxLength: 100}
+        street: {type: string, maxLength: 255}
+        city: {type: string, maxLength: 100}
+        state: {type: [string, 'null'], maxLength: 100}
+        country: {type: string, minLength: 2, maxLength: 2}
+        postal_code: {type: [string, 'null'], maxLength: 20}
+        is_default: {type: boolean}
+    address:
+      allOf:
+        - {$ref: '#/components/schemas/addressInput'}
+        - type: object
+          required: [id, is_default]
+          properties:
+            id: {type: integer}
+            is_default: {type: boolean}
     checkout:
       type: object
-      required: [customer_name, customer_email, customer_phone, shipping_address, payment_method]
+      required: [customer_name, customer_email, customer_phone, payment_method]
+      anyOf:
+        - required: [address_id]
+        - required: [shipping_address]
       properties:
+        order_type: {type: string, enum: [dine_in, takeaway, pickup], default: takeaway}
         customer_name: {type: string}
         customer_email: {type: string, format: email}
         customer_phone: {type: string}
+        address_id: {type: integer, description: An owned saved address ID}
         shipping_address:
           type: object
           required: [building, street, city, country]
           properties:
+            apartment: {type: string, nullable: true}
             building: {type: string}
             street: {type: string}
             city: {type: string}
+            state: {type: string, nullable: true}
             country: {type: string, minLength: 2, maxLength: 2}
-        payment_method: {type: string, enum: [paymob]}
+            postal_code: {type: string, nullable: true}
+        payment_method: {type: string, enum: [paymob, cash_on_delivery]}
         customer_notes: {type: string, nullable: true}
+    order:
+      type: object
+      required: [id, order_number, idempotency_key, order_type, status, payment_status, payment_method, currency, grand_total]
+      properties:
+        id: {type: integer}
+        order_number: {type: string, example: DC-260903-ABCDEFGH}
+        idempotency_key: {type: string, format: uuid, description: Generated automatically by the backend}
+        order_type: {type: string, enum: [dine_in, takeaway, pickup]}
+        status: {type: string, enum: [pending, processing, completed, cancelled]}
+        payment_status: {type: string, enum: [pending, paid, failed, refunded]}
+        payment_method: {type: string, enum: [paymob, cash_on_delivery]}
+        fulfillment_status: {type: string}
+        currency: {type: string, enum: [EGP, USD]}
+        subtotal: {type: integer}
+        discount_total: {type: integer}
+        shipping_total: {type: integer}
+        tax_total: {type: integer}
+        grand_total: {type: integer}
+        shipping_address: {type: object}
+        items: {type: array, items: {type: object}}
+        placed_at: {type: [string, 'null'], format: date-time}
+        paid_at: {type: [string, 'null'], format: date-time}
+    checkoutResult:
+      type: object
+      required: [order, checkout_url]
+      properties:
+        order: {$ref: '#/components/schemas/order'}
+        checkout_url:
+          type: [string, 'null']
+          format: uri
+          description: Paymob Unified Checkout URL, or null for cash on delivery.
     envelope:
       type: object
       required: [data, message, errors]
@@ -144,5 +341,38 @@ components:
         errors: {type: object, nullable: true}
   responses:
     success: {description: Success, content: {application/json: {schema: {$ref: '#/components/schemas/envelope'}}}}
+    user:
+      description: Customer profile
+      content:
+        application/json:
+          schema:
+            allOf:
+              - {$ref: '#/components/schemas/envelope'}
+              - {type: object, properties: {data: {$ref: '#/components/schemas/user'}}}
+    address:
+      description: Customer address
+      content:
+        application/json:
+          schema:
+            allOf:
+              - {$ref: '#/components/schemas/envelope'}
+              - {type: object, properties: {data: {$ref: '#/components/schemas/address'}}}
+    addressList:
+      description: Saved customer addresses, with the default address first
+      content:
+        application/json:
+          schema:
+            allOf:
+              - {$ref: '#/components/schemas/envelope'}
+              - {type: object, properties: {data: {type: array, items: {$ref: '#/components/schemas/address'}}}}
+    checkout:
+      description: Order and optional payment redirect
+      content:
+        application/json:
+          schema:
+            allOf:
+              - {$ref: '#/components/schemas/envelope'}
+              - {type: object, properties: {data: {$ref: '#/components/schemas/checkoutResult'}}}
     validation: {description: Validation error, content: {application/json: {schema: {$ref: '#/components/schemas/envelope'}}}}
     unauthorized: {description: Unauthenticated or invalid signature, content: {application/json: {schema: {$ref: '#/components/schemas/envelope'}}}}
+    forbidden: {description: The authenticated customer does not own this resource, content: {application/json: {schema: {$ref: '#/components/schemas/envelope'}}}}

@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Enums\CatalogStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\V1\ProductResource;
 use App\Models\Product;
@@ -14,8 +13,7 @@ class ProductController extends Controller
     {
         $products = Product::query()
             ->with(['translations', 'categories.translations', 'media'])
-            ->where('status', CatalogStatus::Active)
-            ->where(fn ($query) => $query->whereNull('published_at')->orWhere('published_at', '<=', now()))
+            ->available()
             ->when(request('category'), fn ($query, $slug) => $query->whereHas('categories.translations', fn ($query) => $query->where('slug', $slug)))
             ->when(request('featured'), fn ($query, $featured) => $query->where('is_featured', filter_var($featured, FILTER_VALIDATE_BOOL)))
             ->when(request('search'), fn ($query, $search) => $query->whereHas('translations', fn ($query) => $query->where('name', 'like', '%'.$search.'%')))
@@ -35,7 +33,7 @@ class ProductController extends Controller
     {
         $product = Product::query()
             ->with(['translations', 'categories.translations', 'stages.translations', 'stages.media', 'media'])
-            ->where('status', CatalogStatus::Active)
+            ->available()
             ->whereHas('translations', fn ($query) => $query->where('slug', $slug))
             ->firstOrFail();
 

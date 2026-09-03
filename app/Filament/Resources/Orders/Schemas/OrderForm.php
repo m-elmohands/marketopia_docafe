@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Orders\Schemas;
 
 use App\Enums\FulfillmentStatus;
 use App\Enums\OrderStatus;
+use App\Enums\OrderType;
 use App\Enums\PaymentStatus;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -20,6 +21,7 @@ class OrderForm
                     ->columns(3)
                     ->schema([
                         Select::make('status')->options(OrderStatus::class)->required(),
+                        Select::make('order_type')->options(OrderType::class)->required(),
                         Select::make('payment_status')->options(PaymentStatus::class)->required(),
                         Select::make('fulfillment_status')->options(FulfillmentStatus::class)->required(),
                         Textarea::make('admin_notes')->rows(5)->columnSpanFull(),

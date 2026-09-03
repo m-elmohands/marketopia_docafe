@@ -5,6 +5,8 @@ namespace App\Models;
 use App\Enums\Currency;
 use App\Enums\FulfillmentStatus;
 use App\Enums\OrderStatus;
+use App\Enums\OrderType;
+use App\Enums\PaymentMethod;
 use App\Enums\PaymentStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -37,7 +39,9 @@ class Order extends Model
     {
         return [
             'status' => OrderStatus::class,
+            'order_type' => OrderType::class,
             'payment_status' => PaymentStatus::class,
+            'payment_method' => PaymentMethod::class,
             'fulfillment_status' => FulfillmentStatus::class,
             'currency' => Currency::class,
             'billing_address' => 'array',

@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Models\Article;
 use App\Models\Category;
+use App\Models\CustomerAddress;
 use App\Models\Order;
 use App\Models\PaymentIntention;
 use App\Models\PaymentRefund;
@@ -12,8 +13,10 @@ use App\Models\PaymentWebhook;
 use App\Models\Product;
 use App\Models\Setting;
 use App\Models\User;
+use App\Models\WishlistItem;
 use App\Policies\ArticlePolicy;
 use App\Policies\CategoryPolicy;
+use App\Policies\CustomerAddressPolicy;
 use App\Policies\OrderPolicy;
 use App\Policies\PaymentIntentionPolicy;
 use App\Policies\PaymentRefundPolicy;
@@ -22,6 +25,7 @@ use App\Policies\PaymentWebhookPolicy;
 use App\Policies\ProductPolicy;
 use App\Policies\SettingPolicy;
 use App\Policies\UserPolicy;
+use App\Policies\WishlistItemPolicy;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -48,6 +52,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(User::class, UserPolicy::class);
         Gate::policy(Product::class, ProductPolicy::class);
         Gate::policy(Category::class, CategoryPolicy::class);
+        Gate::policy(CustomerAddress::class, CustomerAddressPolicy::class);
         Gate::policy(Article::class, ArticlePolicy::class);
         Gate::policy(Setting::class, SettingPolicy::class);
         Gate::policy(Order::class, OrderPolicy::class);
@@ -55,6 +60,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(PaymentTransaction::class, PaymentTransactionPolicy::class);
         Gate::policy(PaymentRefund::class, PaymentRefundPolicy::class);
         Gate::policy(PaymentWebhook::class, PaymentWebhookPolicy::class);
+        Gate::policy(WishlistItem::class, WishlistItemPolicy::class);
 
         Gate::before(function (User $user): ?bool {
             return $user->hasRole('super_admin') ? true : null;

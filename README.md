@@ -1,6 +1,6 @@
 # Do Cafe
 
-Do Cafe is a bilingual coffee ecommerce application built with Laravel and Filament. It provides an English/Arabic administration panel, a versioned storefront API, persistent carts, stock-safe checkout, Paymob Unified Checkout, articles, public settings, role-based access control, and media management.
+Do Cafe is a bilingual coffee ecommerce application built with Laravel and Filament. It provides an English/Arabic administration panel, a versioned storefront API, customer wishlists, persistent carts, stock-safe checkout, Paymob Unified Checkout, articles, public settings, role-based access control, and media management.
 
 ## Main features
 
@@ -13,6 +13,7 @@ Do Cafe is a bilingual coffee ecommerce application built with Laravel and Filam
 - Sanctum API authentication for storefront customers
 - Persistent customer carts with inventory validation
 - Transaction-safe checkout with backend-generated idempotency keys
+- Dine-in, takeaway, and pickup order types, defaulting to takeaway
 - Delivery fee and tax calculation from administrative settings
 - Paymob payment intentions, signed callbacks, transactions, and payment-result handling
 - OpenAPI, Swagger UI, and an import-ready Postman collection
@@ -172,10 +173,19 @@ Send `Authorization: Bearer YOUR_TOKEN` with authenticated requests.
 | --- | --- | --- |
 | `GET` | `/api/v1/auth/user` | Get the authenticated customer |
 | `POST` | `/api/v1/auth/logout` | Revoke the current token |
+| `PATCH` | `/api/v1/profile` | Update profile details or password |
+| `GET` | `/api/v1/addresses` | List saved delivery addresses |
+| `POST` | `/api/v1/addresses` | Save a delivery address |
+| `GET` | `/api/v1/addresses/{address}` | View an owned address |
+| `PATCH` | `/api/v1/addresses/{address}` | Update an owned address |
+| `DELETE` | `/api/v1/addresses/{address}` | Soft-delete an owned address |
 | `GET` | `/api/v1/cart` | View the cart |
 | `POST` | `/api/v1/cart/items` | Add a product |
 | `PATCH` | `/api/v1/cart/items/{cartItem}` | Change item quantity |
 | `DELETE` | `/api/v1/cart/items/{cartItem}` | Remove an item |
+| `GET` | `/api/v1/wishlist` | Search, sort, and paginate saved products |
+| `POST` | `/api/v1/wishlist/items` | Add an available product without duplicates |
+| `DELETE` | `/api/v1/wishlist/items/{product}` | Remove a saved product |
 | `POST` | `/api/v1/checkout` | Create an order and Paymob checkout URL |
 | `GET` | `/api/v1/orders` | List the customer’s orders |
 | `GET` | `/api/v1/orders/{order}` | View an owned order |
@@ -191,6 +201,8 @@ API responses use a consistent envelope:
 ```
 
 Money is represented as integer minor units. For example, `11500` represents EGP 115.00.
+
+Checkout accepts either an inline `shipping_address` object or an owned saved `address_id`. Use `payment_method: "paymob"` for online payment or `payment_method: "cash_on_delivery"` for an order with no payment redirect.
 
 ## API documentation
 

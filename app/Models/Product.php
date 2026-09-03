@@ -6,6 +6,8 @@ use App\Enums\CatalogStatus;
 use App\Enums\Currency;
 use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
 use Astrotomic\Translatable\Translatable;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -16,7 +18,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 
 class Product extends Model implements HasMedia, TranslatableContract
 {
-    use InteractsWithMedia, SoftDeletes, Translatable;
+    use HasFactory, InteractsWithMedia, SoftDeletes, Translatable;
 
     /** @var list<string> */
     public array $translatedAttributes = [
@@ -75,6 +77,20 @@ class Product extends Model implements HasMedia, TranslatableContract
     public function orderItems(): HasMany
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    public function wishlistItems(): HasMany
+    {
+        return $this->hasMany(WishlistItem::class);
+    }
+
+    public function scopeAvailable(Builder $query): Builder
+    {
+        return $query
+            ->where('status', CatalogStatus::Active)
+            ->where(fn (Builder $query): Builder => $query
+                ->whereNull('published_at')
+                ->orWhere('published_at', '<=', now()));
     }
 
     public function stages(): HasMany

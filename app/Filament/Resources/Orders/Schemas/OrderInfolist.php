@@ -19,6 +19,8 @@ class OrderInfolist
                         TextEntry::make('customer_name'),
                         TextEntry::make('customer_email')->copyable(),
                         TextEntry::make('customer_phone')->placeholder('—'),
+                        TextEntry::make('order_type')->badge(),
+                        TextEntry::make('payment_method')->badge(),
                         TextEntry::make('shipping_address')
                             ->getStateUsing(fn ($record): string => collect($record->shipping_address)->filter()->implode(', '))
                             ->columnSpanFull(),

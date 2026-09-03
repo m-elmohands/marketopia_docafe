@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Api\V1;
 
+use App\Enums\OrderType;
 use App\Enums\PaymentStatus;
 use App\Models\Order;
 use App\Models\Product;
@@ -52,6 +53,7 @@ class EcommerceApiTest extends TestCase
         ])->assertCreated()->assertJsonPath('data.items_count', 2);
 
         $payload = [
+            'order_type' => OrderType::Pickup->value,
             'customer_name' => 'Ahmed Ali',
             'customer_email' => 'customer@example.com',
             'customer_phone' => '+201001234567',
@@ -66,15 +68,41 @@ class EcommerceApiTest extends TestCase
 
         $checkout = $this->withHeaders($headers)->postJson('/api/v1/checkout', $payload)
             ->assertCreated()
+            ->assertJsonPath('data.order.order_type', OrderType::Pickup->value)
             ->assertJsonPath('data.order.payment_status', 'pending')
             ->assertJsonPath('data.order.idempotency_key', Order::query()->firstOrFail()->idempotency_key);
 
         $this->assertStringContainsString('clientSecret=client-secret', $checkout->json('data.checkout_url'));
         $this->assertSame(3, $product->fresh()->stock_quantity);
         $this->assertDatabaseCount('orders', 1);
+        $this->assertDatabaseHas('orders', ['order_type' => OrderType::Pickup->value]);
         $this->assertDatabaseMissing('cart_items', ['product_id' => $product->id]);
         $this->assertNotNull(Order::query()->firstOrFail()->idempotency_key);
         Http::assertSentCount(1);
+    }
+
+    public function test_checkout_returns_422_for_an_invalid_order_type(): void
+    {
+        $user = User::factory()->create();
+        $token = $user->createToken('phpunit')->plainTextToken;
+
+        $this->withToken($token)->postJson('/api/v1/checkout', [
+            'order_type' => 'delivery',
+            'customer_name' => 'Ahmed Ali',
+            'customer_email' => 'customer@example.com',
+            'customer_phone' => '+201001234567',
+            'shipping_address' => [
+                'building' => '10',
+                'street' => 'Tahrir Street',
+                'city' => 'Cairo',
+                'country' => 'EG',
+            ],
+            'payment_method' => 'paymob',
+        ])->assertUnprocessable()
+            ->assertJsonValidationErrors(['order_type'])
+            ->assertJsonPath('errors.order_type.0', 'The selected order type is invalid.');
+
+        $this->assertDatabaseCount('orders', 0);
     }
 
     public function test_paymob_webhook_rejects_bad_hmac_and_marks_a_matching_order_paid(): void

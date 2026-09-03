@@ -7,6 +7,7 @@ use App\Enums\CatalogStatus;
 use App\Enums\Currency;
 use App\Enums\FulfillmentStatus;
 use App\Enums\OrderStatus;
+use App\Enums\OrderType;
 use App\Enums\PaymentProcessingStatus;
 use App\Enums\PaymentStatus;
 use App\Enums\SettingType;
@@ -51,6 +52,7 @@ class FixedChoiceEnumsTest extends TestCase
         $this->assertSame(CatalogStatus::Active, $product->fresh()->status);
         $this->assertSame(Currency::EGP, $product->fresh()->currency);
         $this->assertSame(OrderStatus::Processing, $order->fresh()->status);
+        $this->assertSame(OrderType::Takeaway, $order->fresh()->order_type);
         $this->assertSame(PaymentStatus::Paid, $order->fresh()->payment_status);
         $this->assertSame(FulfillmentStatus::Processing, $order->fresh()->fulfillment_status);
         $this->assertSame(CatalogStatus::Archived, (new Category(['status' => 'archived']))->status);
@@ -75,6 +77,24 @@ class FixedChoiceEnumsTest extends TestCase
             'status' => 'not-a-status',
             'price' => 0,
             'currency' => Currency::EGP->value,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
+    public function test_database_rejects_an_invalid_order_type(): void
+    {
+        $this->expectException(QueryException::class);
+
+        DB::table('orders')->insert([
+            'order_number' => 'INVALID-ORDER-TYPE-1',
+            'order_type' => 'delivery',
+            'customer_name' => 'Enum Customer',
+            'customer_email' => 'enum@example.com',
+            'shipping_address' => json_encode(['city' => 'Cairo'], JSON_THROW_ON_ERROR),
+            'currency' => Currency::EGP->value,
+            'subtotal' => 7_500,
+            'grand_total' => 7_500,
             'created_at' => now(),
             'updated_at' => now(),
         ]);

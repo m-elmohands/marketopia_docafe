@@ -19,6 +19,7 @@
         {"key": "article_slug", "value": "how-espresso-is-made", "type": "string"},
         {"key": "product_id", "value": "1", "type": "string"},
         {"key": "cart_item_id", "value": "1", "type": "string"},
+        {"key": "address_id", "value": "1", "type": "string"},
         {"key": "order_id", "value": "1", "type": "string"},
         {"key": "paymob_hmac", "value": "", "type": "string"}
     ],
@@ -55,6 +56,17 @@
             ]
         },
         {
+            "name": "Customer Account",
+            "item": [
+                {"name": "Update Profile", "request": {"method": "PATCH", "header": [{"key": "Accept", "value": "application/json"}, {"key": "Accept-Language", "value": "{{locale}}"}], "body": {"mode": "raw", "raw": "{\n  \"name\": \"Coffee Customer\",\n  \"phone\": \"+201001234567\"\n}", "options": {"raw": {"language": "json"}}}, "url": "{{base_url}}/profile"}},
+                {"name": "List Addresses", "request": {"method": "GET", "header": [{"key": "Accept", "value": "application/json"}], "url": "{{base_url}}/addresses"}},
+                {"name": "Save Address", "event": [{"listen": "test", "script": {"type": "text/javascript", "exec": ["const body = pm.response.json();", "if (body.data && body.data.id) pm.collectionVariables.set('address_id', body.data.id);"]}}], "request": {"method": "POST", "header": [{"key": "Accept", "value": "application/json"}], "body": {"mode": "raw", "raw": "{\n  \"label\": \"Home\",\n  \"recipient_name\": \"Coffee Customer\",\n  \"phone\": \"+201001234567\",\n  \"building\": \"10\",\n  \"street\": \"Tahrir Street\",\n  \"city\": \"Cairo\",\n  \"country\": \"EG\",\n  \"is_default\": true\n}", "options": {"raw": {"language": "json"}}}, "url": "{{base_url}}/addresses"}},
+                {"name": "Show Address", "request": {"method": "GET", "header": [{"key": "Accept", "value": "application/json"}], "url": "{{base_url}}/addresses/{{address_id}}"}},
+                {"name": "Update Address", "request": {"method": "PATCH", "header": [{"key": "Accept", "value": "application/json"}], "body": {"mode": "raw", "raw": "{\n  \"label\": \"Updated Home\"\n}", "options": {"raw": {"language": "json"}}}, "url": "{{base_url}}/addresses/{{address_id}}"}},
+                {"name": "Delete Address", "request": {"method": "DELETE", "header": [{"key": "Accept", "value": "application/json"}], "url": "{{base_url}}/addresses/{{address_id}}"}}
+            ]
+        },
+        {
             "name": "Content",
             "item": [
                 {"name": "List Articles", "request": {"auth": {"type": "noauth"}, "method": "GET", "header": [{"key": "Accept-Language", "value": "{{locale}}"}], "url": "{{base_url}}/articles"}},
@@ -72,6 +84,14 @@
             ]
         },
         {
+            "name": "Wishlist",
+            "item": [
+                {"name": "List Wishlist", "request": {"method": "GET", "header": [{"key": "Accept", "value": "application/json"}, {"key": "Accept-Language", "value": "{{locale}}"}], "url": "{{base_url}}/wishlist?sort=newest&per_page=15"}},
+                {"name": "Add Product", "request": {"method": "POST", "header": [{"key": "Accept", "value": "application/json"}, {"key": "Accept-Language", "value": "{{locale}}"}], "body": {"mode": "raw", "raw": "{\n  \"product_id\": {{product_id}}\n}", "options": {"raw": {"language": "json"}}}, "url": "{{base_url}}/wishlist/items"}},
+                {"name": "Remove Product", "request": {"method": "DELETE", "header": [{"key": "Accept", "value": "application/json"}, {"key": "Accept-Language", "value": "{{locale}}"}], "url": "{{base_url}}/wishlist/items/{{product_id}}"}}
+            ]
+        },
+        {
             "name": "Checkout and Orders",
             "item": [
                 {
@@ -79,8 +99,9 @@
                     "event": [
                         {"listen": "test", "script": {"type": "text/javascript", "exec": ["const body = pm.response.json();", "if (body.data && body.data.order) pm.collectionVariables.set('order_id', body.data.order.id);"]}}
                     ],
-                    "request": {"method": "POST", "header": [{"key": "Accept", "value": "application/json"}, {"key": "Accept-Language", "value": "{{locale}}"}], "body": {"mode": "raw", "raw": "{\n  \"customer_name\": \"Coffee Customer\",\n  \"customer_email\": \"{{email}}\",\n  \"customer_phone\": \"+201001234567\",\n  \"shipping_address\": {\n    \"building\": \"10\",\n    \"street\": \"Tahrir Street\",\n    \"city\": \"Cairo\",\n    \"country\": \"EG\"\n  },\n  \"payment_method\": \"paymob\"\n}", "options": {"raw": {"language": "json"}}}, "url": "{{base_url}}/checkout"}
+                    "request": {"method": "POST", "header": [{"key": "Accept", "value": "application/json"}, {"key": "Accept-Language", "value": "{{locale}}"}], "body": {"mode": "raw", "raw": "{\n  \"order_type\": \"takeaway\",\n  \"customer_name\": \"Coffee Customer\",\n  \"customer_email\": \"{{email}}\",\n  \"customer_phone\": \"+201001234567\",\n  \"shipping_address\": {\n    \"building\": \"10\",\n    \"street\": \"Tahrir Street\",\n    \"city\": \"Cairo\",\n    \"country\": \"EG\"\n  },\n  \"payment_method\": \"paymob\"\n}", "options": {"raw": {"language": "json"}}}, "url": "{{base_url}}/checkout"}
                 },
+                {"name": "Create Cash on Delivery Checkout", "event": [{"listen": "test", "script": {"type": "text/javascript", "exec": ["const body = pm.response.json();", "if (body.data && body.data.order) pm.collectionVariables.set('order_id', body.data.order.id);"]}}], "request": {"method": "POST", "header": [{"key": "Accept", "value": "application/json"}, {"key": "Accept-Language", "value": "{{locale}}"}], "body": {"mode": "raw", "raw": "{\n  \"order_type\": \"takeaway\",\n  \"customer_name\": \"Coffee Customer\",\n  \"customer_email\": \"{{email}}\",\n  \"customer_phone\": \"+201001234567\",\n  \"address_id\": {{address_id}},\n  \"payment_method\": \"cash_on_delivery\"\n}", "options": {"raw": {"language": "json"}}}, "url": "{{base_url}}/checkout"}},
                 {"name": "List Orders", "request": {"method": "GET", "header": [{"key": "Accept", "value": "application/json"}], "url": "{{base_url}}/orders"}},
                 {"name": "Show Order", "request": {"method": "GET", "header": [{"key": "Accept", "value": "application/json"}], "url": "{{base_url}}/orders/{{order_id}}"}}
             ]

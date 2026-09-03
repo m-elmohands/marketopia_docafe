@@ -5,9 +5,12 @@ namespace App\Actions\Checkout;
 use App\Enums\Currency;
 use App\Enums\FulfillmentStatus;
 use App\Enums\OrderStatus;
+use App\Enums\OrderType;
+use App\Enums\PaymentMethod;
 use App\Enums\PaymentStatus;
 use App\Models\AuditLog;
 use App\Models\Cart;
+use App\Models\CustomerAddress;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
@@ -46,22 +49,27 @@ class CreateCheckout
             }
 
             $totals = $this->totals->calculate($subtotal);
+            $shippingAddress = isset($data['address_id'])
+                ? CustomerAddress::query()->whereBelongsTo($user)->findOrFail($data['address_id'])->toOrderAddress()
+                : $data['shipping_address'];
+            $paymentMethod = PaymentMethod::from($data['payment_method']);
 
             $order = Order::create([
                 'order_number' => 'DC-'.now()->format('ymd').'-'.Str::upper(Str::random(8)),
                 'idempotency_key' => (string) Str::uuid(),
                 'user_id' => $user->id,
+                'order_type' => OrderType::from($data['order_type'] ?? OrderType::Takeaway->value),
                 'status' => OrderStatus::Pending,
                 'payment_status' => PaymentStatus::Pending,
                 'fulfillment_status' => FulfillmentStatus::Unfulfilled,
                 'customer_name' => $data['customer_name'],
                 'customer_email' => $data['customer_email'],
                 'customer_phone' => $data['customer_phone'],
-                'billing_address' => $data['billing_address'] ?? $data['shipping_address'],
-                'shipping_address' => $data['shipping_address'],
+                'billing_address' => $data['billing_address'] ?? $shippingAddress,
+                'shipping_address' => $shippingAddress,
                 'currency' => Currency::EGP,
                 ...$totals,
-                'payment_method' => 'paymob',
+                'payment_method' => $paymentMethod,
                 'customer_notes' => $data['customer_notes'] ?? null,
                 'placed_at' => now(),
             ]);
@@ -86,6 +94,12 @@ class CreateCheckout
             return $order->load('items');
         });
 
+        if ($order->payment_method === PaymentMethod::CashOnDelivery) {
+            $this->completeCheckout($user, $order);
+
+            return ['order' => $order, 'checkout_url' => null];
+        }
+
         try {
             $providerData = $this->paymob->createIntention($order);
             $checkoutUrl = $this->paymob->checkoutUrl($providerData['client_secret']);
@@ -101,8 +115,7 @@ class CreateCheckout
                 'provider_data' => [...$providerData, 'checkout_url' => $checkoutUrl],
             ]);
 
-            $user->cart?->items()->delete();
-            AuditLog::create(['user_id' => $user->id, 'action' => 'checkout.created', 'auditable_type' => Order::class, 'auditable_id' => $order->id, 'ip_address' => request()->ip()]);
+            $this->completeCheckout($user, $order);
 
             return ['order' => $order, 'checkout_url' => $checkoutUrl];
         } catch (Throwable $exception) {
@@ -117,5 +130,17 @@ class CreateCheckout
 
             throw $exception;
         }
+    }
+
+    private function completeCheckout(User $user, Order $order): void
+    {
+        $user->cart?->items()->delete();
+        AuditLog::create([
+            'user_id' => $user->id,
+            'action' => 'checkout.created',
+            'auditable_type' => Order::class,
+            'auditable_id' => $order->id,
+            'ip_address' => request()->ip(),
+        ]);
     }
 }

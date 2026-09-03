@@ -1,4 +1,10 @@
 {
+    "Address deleted successfully.": "Address deleted successfully.",
+    "Cash on delivery": "Cash on delivery",
+    "Paymob": "Paymob",
+    "Profile updated successfully.": "Profile updated successfully.",
+    "Product removed from wishlist.": "Product removed from wishlist.",
+    "The selected product is not available.": "The selected product is not available.",
     "English": "English",
     "Arabic": "Arabic",
     "Catalog": "Catalog",
@@ -125,5 +131,8 @@
     "Payment was not completed": "Payment was not completed",
     "Invalid payment response": "Invalid payment response",
     "Your order remains unpaid.": "Your order remains unpaid.",
-    "The payment response signature could not be verified.": "The payment response signature could not be verified."
+    "The payment response signature could not be verified.": "The payment response signature could not be verified.",
+    "Dine in": "Dine in",
+    "Takeaway": "Takeaway",
+    "Pickup": "Pickup"
 }

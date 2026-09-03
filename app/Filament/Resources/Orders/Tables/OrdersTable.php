@@ -3,6 +3,8 @@
 namespace App\Filament\Resources\Orders\Tables;
 
 use App\Enums\OrderStatus;
+use App\Enums\OrderType;
+use App\Enums\PaymentMethod;
 use App\Enums\PaymentStatus;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
@@ -18,15 +20,19 @@ class OrdersTable
             ->columns([
                 TextColumn::make('order_number')->searchable()->copyable()->sortable(),
                 TextColumn::make('customer_name')->searchable(),
+                TextColumn::make('order_type')->badge(),
                 TextColumn::make('grand_total')->money(fn ($record): string => $record->currency->value, divideBy: 100)->sortable(),
                 TextColumn::make('status')->badge(),
                 TextColumn::make('payment_status')->badge(),
+                TextColumn::make('payment_method')->badge(),
                 TextColumn::make('fulfillment_status')->badge(),
                 TextColumn::make('placed_at')->dateTime()->sortable(),
             ])
             ->filters([
                 SelectFilter::make('status')->options(OrderStatus::class),
+                SelectFilter::make('order_type')->options(OrderType::class),
                 SelectFilter::make('payment_status')->options(PaymentStatus::class),
+                SelectFilter::make('payment_method')->options(PaymentMethod::class),
             ])
             ->recordActions([
                 ViewAction::make(),

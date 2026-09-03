@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\Auth\LoginRequest;
 use App\Http\Requests\Api\V1\Auth\RegisterRequest;
+use App\Http\Resources\Api\V1\UserResource;
 use App\Models\User;
 use App\Support\Api\RespondsWithApiEnvelope;
 use Illuminate\Http\JsonResponse;
@@ -57,6 +58,6 @@ class AuthController extends Controller
 
     private function userData(User $user): array
     {
-        return ['id' => $user->id, 'name' => $user->name, 'email' => $user->email];
+        return (new UserResource($user))->resolve();
     }
 }

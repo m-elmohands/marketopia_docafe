@@ -1,4 +1,10 @@
 {
+    "Address deleted successfully.": "تم حذف العنوان بنجاح.",
+    "Cash on delivery": "الدفع عند الاستلام",
+    "Paymob": "باي موب",
+    "Profile updated successfully.": "تم تحديث الملف الشخصي بنجاح.",
+    "Product removed from wishlist.": "تمت إزالة المنتج من قائمة الرغبات.",
+    "The selected product is not available.": "المنتج المحدد غير متاح.",
     "English": "الإنجليزية",
     "Arabic": "العربية",
     "Catalog": "الكتالوج",
@@ -125,5 +131,8 @@
     "Payment was not completed": "لم تكتمل عملية الدفع",
     "Invalid payment response": "استجابة الدفع غير صالحة",
     "Your order remains unpaid.": "لا يزال طلبك غير مدفوع.",
-    "The payment response signature could not be verified.": "تعذر التحقق من توقيع استجابة الدفع."
+    "The payment response signature could not be verified.": "تعذر التحقق من توقيع استجابة الدفع.",
+    "Dine in": "تناول داخل المقهى",
+    "Takeaway": "طلب خارجي",
+    "Pickup": "استلام من الفرع"
 }
